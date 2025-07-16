@@ -27,9 +27,9 @@ public class Volunteer
     public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
 
 
-    private readonly List<PetRequisites> _requisites = [];
+    private readonly List<Requisites> _requisites = [];
 
-    public IReadOnlyCollection<PetRequisites> Requisites => _requisites.AsReadOnly();
+    public IReadOnlyCollection<Requisites> Requisites => _requisites.AsReadOnly();
 
 
     private readonly List<Pet> _pets = new();
@@ -96,7 +96,7 @@ public class Volunteer
     }
 
 
-    public Result AddRequisite(PetRequisites requisite)  // получается дублирование кода тут и в классе Pet - это ок ? не понятна связь
+    public Result AddRequisite(Requisites requisite)  // получается дублирование кода тут и в классе Pet - это ок ? не понятна связь
     {
         if (requisite is null)
             return Result.Failure("Реквизит не может быть null");

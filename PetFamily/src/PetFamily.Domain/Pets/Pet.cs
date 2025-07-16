@@ -32,14 +32,12 @@ public class Pet
 
     public DateTime CreatedAt { get; private set; }
 
+    public PetType PetType { get; private set; }
 
-    private readonly List<PetRequisites> _petRequisites = [];
 
-    public IReadOnlyCollection<PetRequisites> PetRequisites => _petRequisites.AsReadOnly();
+    private readonly List<Requisites> _petRequisites = [];
 
-    public Guid BreedId { get; private set; } //навигационная ссылка на попроду(надо делать private?) 
-
-    public Guid SpeciesId { get; private set; } //навигационная ссылка на вид
+    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
 
 
     private Pet() { }
@@ -55,7 +53,7 @@ public class Pet
         double height,
         bool vaccinated,
         PetStatus petStatus = PetStatus.LookingTreatment,
-        IReadOnlyCollection<PetRequisites>? requisites = null)
+        IReadOnlyCollection<Requisites>? requisites = null)
     {
         Name = name; 
         Color = color;
@@ -70,10 +68,10 @@ public class Pet
         CreatedAt = DateTime.UtcNow;
     }
 
-    public  Result AddRequisites(PetRequisites requisite)
+    public  Result AddRequisites(Requisites requisite)
     {
         if (requisite is null)
-             return Result.Failure<PetRequisites>("Реквизиты не найдены!");
+             return Result.Failure<Requisites>("Реквизиты не найдены!");
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
             return Result.Failure("Название реквизита не может быть пустым");
@@ -82,7 +80,7 @@ public class Pet
         return Result.Success(requisite);
     }
 
-    public Result RemoveRequisites(PetRequisites requisite)
+    public Result RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Result.Failure("Реквизит не может быть null");
@@ -94,7 +92,7 @@ public class Pet
         return Result.Success();
     }
 
-    public Result UpdateRequisites(PetRequisites oldRequisite, PetRequisites newRequisite)
+    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
     {
         var removeResult = RemoveRequisites(oldRequisite);
         if (removeResult.IsFailure)

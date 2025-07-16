@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using PetFamily.Domain.Pets.Species;
 using PetFamily.Domain.Requsites;
 
 namespace PetFamily.Domain.Pets;
@@ -6,13 +7,13 @@ namespace PetFamily.Domain.Pets;
 public class Pet
 {
     public Guid Id { get; set; }
-    public string Name { get; private set; } = null!;
+    public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; }  = string.Empty;
 
     public PetColor Color;
 
-    public string HealthInfo { get; private set; } = string.Empty!;
+    public string HealthInfo { get; private set; } = string.Empty;
 
     public string PetAddress { get; private set; } = string.Empty;
 
@@ -32,7 +33,7 @@ public class Pet
 
     public DateTime CreatedAt { get; private set; }
 
-    public PetType PetType { get; private set; }
+    public PetType PetType { get; private set; } = null!;
 
 
     private readonly List<Requisites> _petRequisites = [];
@@ -47,13 +48,16 @@ public class Pet
         string description,
         PetColor color,
         string healthInfo,
-        string ownerPhone,
         string petAddress,
-        double weight,
-        double height,
+        string ownerPhone,
         bool vaccinated,
+        double height,
+        double weight,
+        PetType petType,
+        DateTime createdAt,
         PetStatus petStatus = PetStatus.LookingTreatment,
-        IReadOnlyCollection<Requisites>? requisites = null)
+        IReadOnlyCollection<Requisites>? requisites = null
+        )
     {
         Name = name; 
         Color = color;
@@ -65,6 +69,8 @@ public class Pet
         Height = height;
         Vaccinated = vaccinated;
         PetStatus = petStatus;
+        PetType = petType;
+        CreatedAt = createdAt;
         CreatedAt = DateTime.UtcNow;
     }
 

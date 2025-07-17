@@ -1,13 +1,11 @@
-﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.Pets;
+﻿using PetFamily.Domain.Pets;
 using PetFamily.Domain.Requsites;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
 
-public class Volunteer
+public class Volunteer : Entity<VolunteerId>
 {
-    public Guid Id { get; set; }
-
     public string FirstName { get; set; } = null!;
 
     public string MiddleName { get; set; } = string.Empty;
@@ -41,9 +39,10 @@ public class Volunteer
     public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
     public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
 
-    private Volunteer() { }
+    private Volunteer(VolunteerId id) : base(id) { }
 
     public Volunteer(
+           VolunteerId volunteerId,
            string firstName,
            string lastName,
            string email,
@@ -51,6 +50,8 @@ public class Volunteer
            string? middleName = null,
            string? volunteerInfo = null,
            decimal experienceYears = 0)
+
+        : base(volunteerId)
     {
         FirstName = firstName;
         LastName = lastName;

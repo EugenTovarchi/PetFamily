@@ -1,12 +1,11 @@
-﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.Pets.Species;
+﻿using PetFamily.Domain.Pets.Species;
 using PetFamily.Domain.Requsites;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Pets;
 
-public class Pet
+public class Pet : Entity<PetId>
 {
-    public Guid Id { get; set; }
     public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; }  = string.Empty;
@@ -41,9 +40,10 @@ public class Pet
     public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
 
 
-    private Pet() { }
+    private Pet(PetId id) :base (id) { }
 
     public Pet(
+        PetId petId,
         string name,
         string description,
         PetColor color,
@@ -57,7 +57,7 @@ public class Pet
         DateTime createdAt,
         PetStatus petStatus = PetStatus.LookingTreatment,
         IReadOnlyCollection<Requisites>? requisites = null
-        )
+        ) : base (petId)
     {
         Name = name; 
         Color = color;

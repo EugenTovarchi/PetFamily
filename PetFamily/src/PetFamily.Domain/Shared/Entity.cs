@@ -2,7 +2,7 @@
 
 public abstract class Entity <Tid> where Tid: notnull
 {
-    protected Entity (Tid id) => Id = Id;
+    protected Entity (Tid id) => Id = id;
     
     public Tid Id { get; private set; }
 }

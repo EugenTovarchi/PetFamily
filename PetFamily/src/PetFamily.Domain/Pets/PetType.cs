@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Pets
 {
@@ -16,7 +16,7 @@ namespace PetFamily.Domain.Pets
         public static Result<PetType> Create(Guid speciesId, Guid breedId)
         {
             if (speciesId == Guid.Empty || breedId == Guid.Empty)
-                return Result.Failure<PetType>("ID не могут быть пустыми");
+                return "ID не могут быть пустыми";
 
             return new PetType(speciesId, breedId);
         }

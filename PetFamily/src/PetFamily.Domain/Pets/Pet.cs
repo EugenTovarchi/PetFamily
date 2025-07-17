@@ -1,5 +1,4 @@
-﻿using PetFamily.Domain.Pets.Species;
-using PetFamily.Domain.Requsites;
+﻿using PetFamily.Domain.Requsites;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Pets;
@@ -74,25 +73,25 @@ public class Pet : Entity<PetId>
         CreatedAt = DateTime.UtcNow;
     }
 
-    public  Result AddRequisites(Requisites requisite)
+    public  Result<Requisites> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
-             return Result.Failure<Requisites>("Реквизиты не найдены!");
+             return "Реквизиты не найдены!";
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return Result.Failure("Название реквизита не может быть пустым");
+            return "Название реквизита не может быть пустым";
 
         _petRequisites.Add(requisite);
-        return Result.Success(requisite);
+        return requisite;
     }
 
     public Result RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
-            return Result.Failure("Реквизит не может быть null");
+            return "Реквизит не может быть null";
 
         if (!_petRequisites.Contains(requisite))
-            return Result.Failure("Реквизит не найден");
+            return "Реквизит не найден";
 
         _petRequisites.Remove(requisite);
         return Result.Success();

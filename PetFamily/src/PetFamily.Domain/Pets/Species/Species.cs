@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿using PetFamily.Domain.Shared;
 using System.Collections.ObjectModel;
 
 namespace PetFamily.Domain.Pets.Species;
@@ -15,28 +15,28 @@ public  class Species
     private readonly List<Breed> _breeds = new();
     public ReadOnlyCollection<Breed> Breeds => _breeds.AsReadOnly();
 
-    public Result AddBreed(Breed breed)
+    public Result<Breed> AddBreed(Breed breed)
     {
         if (breed is null)
-            return Result.Failure<Breed>("Порода не найдена!");
+            return "Порода не найдена!";
 
         if (string.IsNullOrWhiteSpace(breed.Title))
-            return Result.Failure("Порода не может быть пустой");
+            return "Порода не может быть пустой";
 
         if (Title.Length> 100)
-            return Result.Failure("Название породы слишком длинное");
+            return "Название породы слишком длинное";
 
         _breeds.Add(breed);
-        return Result.Success(breed);
+        return breed;
     }
 
     public Result RemoveBreed(Breed breed)
     {
         if (breed is null)
-            return Result.Failure("Порода не может быть null");
+            return "Порода не может быть null";
 
         if (!_breeds.Contains(breed))
-            return Result.Failure("Порода не найдена");
+            return "Порода не найдена";
 
         _breeds.Remove(breed);
         return Result.Success();

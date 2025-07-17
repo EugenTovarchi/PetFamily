@@ -20,7 +20,7 @@ public class Volunteer : Entity<VolunteerId>
 
     public string Phone { get; set; } = null!;
 
-    private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = new();
+    private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
 
     public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
 
@@ -30,7 +30,7 @@ public class Volunteer : Entity<VolunteerId>
     public IReadOnlyCollection<Requisites> Requisites => _requisites.AsReadOnly();
 
 
-    private readonly List<Pet> _pets = new();
+    private readonly List<Pet> _pets = [];
 
     public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();
 
@@ -66,10 +66,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result AddPet(Pet pet)
     {
         if (pet == null)
-            return Result.Failure("Питомец не может иметь значение null");
+            return "Питомец не может иметь значение null";
 
         if (_pets.Contains(pet))
-            return Result.Failure("Этот питомец уже закреплён за волонтёром");
+            return "Этот питомец уже закреплён за волонтёром";
 
         _pets.Add(pet);
         return Result.Success();
@@ -78,10 +78,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result RemovePet(Pet pet)
     {
         if (pet is null)
-            return Result.Failure("Реквизит не может быть null");
+            return "Реквизит не может быть null";
 
         if (!_pets.Contains(pet))
-            return Result.Failure("Реквизит не найден");
+            return "Реквизит не найден";
 
         _pets.Remove(pet);
         return Result.Success();
@@ -97,26 +97,26 @@ public class Volunteer : Entity<VolunteerId>
     }
 
 
-    public Result AddRequisite(Requisites requisite)  // получается дублирование кода тут и в классе Pet - это ок ? не понятна связь
+    public Result<Requisites> AddRequisite(Requisites requisite)  
     {
         if (requisite is null)
-            return Result.Failure("Реквизит не может быть null");
+            return "Реквизит не может быть null";
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return Result.Failure("Название реквизита не может быть пустым");
+            return "Название реквизита не может быть пустым";
 
         _requisites.Add(requisite);
-        return Result.Success();
+        return requisite;
     }
 
 
     public Result AddSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
-            return Result.Failure("Соцсеть не может быть null");
+            return "Соцсеть не может быть null";
 
         if (_volunteerSocialMedias.Any(s => s.Title == socialMedia.Title))
-            return Result.Failure($"Соцсеть {socialMedia.Title} уже добавлена");
+            return $"Соцсеть {socialMedia.Title} уже добавлена";
 
         _volunteerSocialMedias.Add(socialMedia);
         return Result.Success();
@@ -124,10 +124,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result RemoveSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
-            return Result.Failure("Соцсеть не может быть null");
+            return "Соцсеть не может быть null";
 
         if (!_volunteerSocialMedias.Contains(socialMedia))
-            return Result.Failure("Соцсеть не найдена");
+            return "Соцсеть не найдена";
 
         _volunteerSocialMedias.Remove(socialMedia);
         return Result.Success();
@@ -140,5 +140,4 @@ public class Volunteer : Entity<VolunteerId>
 
         return _pets.Count(p => p.PetStatus == status);
     }
-
 }

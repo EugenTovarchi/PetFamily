@@ -13,7 +13,7 @@ public class Pet : Entity<PetId>
 
     public string HealthInfo { get; private set; } = string.Empty;
 
-    public string PetAddress { get; private set; } = string.Empty;
+    public PetAddress PetAddress { get; private set; } = null!;
 
     public double? Weight { get; private set; }
 
@@ -47,7 +47,7 @@ public class Pet : Entity<PetId>
         string description,
         PetColor color,
         string healthInfo,
-        string petAddress,
+        PetAddress petAddress,
         string ownerPhone,
         bool vaccinated,
         double height,

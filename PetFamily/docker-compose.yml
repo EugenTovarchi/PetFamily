@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres:  
+    container_name: petPostgres
+    image: postgres:latest  
+    restart: always
+    environment:
+      POSTGRES_DB: pet_family
+      POSTGRES_USER: istred
+      POSTGRES_PASSWORD: istred123
+    ports:
+      - "5437:5432"  # Порт должен быть в кавычках
+    volumes:
+      - postgres-data:/var/lib/postgresql/data  
+
+volumes:
+  postgres-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: D:\DockerImages\DockerDesktopWSL\disk\data

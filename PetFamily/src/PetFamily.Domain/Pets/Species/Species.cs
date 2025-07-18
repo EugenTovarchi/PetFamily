@@ -42,7 +42,7 @@ public  class Species
         return Result.Success();
     }
 
-    public Result EditSpecies(Breed oldBreed, Breed newBreed)
+    public Result EditBreed(Breed oldBreed, Breed newBreed)
     {
         var removeResult = RemoveBreed(oldBreed);
         if (removeResult.IsFailure)

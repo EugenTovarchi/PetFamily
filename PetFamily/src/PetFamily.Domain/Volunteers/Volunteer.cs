@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.Pets;
+using PetFamily.Domain.Pets;
 using PetFamily.Domain.Requsites;
 using PetFamily.Domain.Shared;
 
@@ -6,19 +6,15 @@ namespace PetFamily.Domain.Volunteers;
 
 public class Volunteer : Entity<VolunteerId>
 {
-    public string FirstName { get; set; } = null!;
+    public VolunteerFullName VolunteerFullName { get; private set; } = null!;
 
-    public string MiddleName { get; set; } = string.Empty;
-
-    public string LastName { get; set; } = null!;
-
-    public string Email { get; set; } = null!;
+    public Email Email { get; set; } = null!;
 
     public string VolunteerInfo { get; set; } = string.Empty!;
 
     public decimal ExperienceYears { get; set; } = decimal.Zero;
 
-    public string Phone { get; set; } = null!;
+    public Phone Phone { get; set; } = null!;
 
     private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
 
@@ -43,19 +39,16 @@ public class Volunteer : Entity<VolunteerId>
 
     public Volunteer(
            VolunteerId volunteerId,
-           string firstName,
-           string lastName,
-           string email,
-           string phone,
+           VolunteerFullName volunteerFullName,
+           Email email,
+           Phone phone,
            string? middleName = null,
            string? volunteerInfo = null,
            decimal experienceYears = 0)
 
         : base(volunteerId)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        MiddleName = middleName ?? string.Empty;
+        VolunteerFullName = volunteerFullName;
         Email = email;
         Phone = phone;
         VolunteerInfo = volunteerInfo ?? string.Empty;

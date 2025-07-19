@@ -1,5 +1,3 @@
-﻿using PetFamily.Domain.Pets;
-
 public record VolunteerId
 {
     private VolunteerId(Guid value) => Value = value;

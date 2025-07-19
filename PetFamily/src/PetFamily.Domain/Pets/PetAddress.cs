@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Pets;
 
@@ -13,8 +13,8 @@ public record PetAddress
 
     private PetAddress(string city, string street, uint house, uint flat)
     {
-        City = city;
-        Street = street;
+        City = city.Trim();
+        Street = street.Trim();
         House = house;
         Flat = flat;
     }

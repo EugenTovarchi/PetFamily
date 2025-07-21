@@ -1,11 +1,8 @@
-﻿namespace PetFamily.Domain.Pets;
+namespace PetFamily.Domain.Pets;
 
 public record PetId
 {
-    private PetId(Guid value)
-    {
-        Value = value;
-    }
+    private PetId(Guid value) => Value = value;
 
     public Guid Value { get; }
 
@@ -15,9 +12,9 @@ public record PetId
 
     public static PetId Create(Guid id) => new(id);
 
-    public static implicit operator Guid(PetId petId)
-    {
-        ArgumentNullException.ThrowIfNull(petId);
-        return petId.Value;
-    }
+    //public static implicit operator Guid(PetId petId)
+    //{
+    //    ArgumentNullException.ThrowIfNull(petId);
+    //    return petId.Value;
+    //}
 }

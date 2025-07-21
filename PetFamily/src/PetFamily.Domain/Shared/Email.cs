@@ -1,17 +1,16 @@
-using PetFamily.Domain.Shared;
+using PetFamily.Infrastructure.Configurations;
 
-namespace PetFamily.Domain.Volunteers;
+namespace PetFamily.Domain.Shared;
 
 public sealed record Email
 {
-    private const int MAX_MAIL_LENGTH = 40;
     public string Value { get; } = null!;
 
     private Email(string value) => Value = value;
 
     public static Result<Email> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value) && value.Length > MAX_MAIL_LENGTH)
+        if (string.IsNullOrWhiteSpace(value) && value.Length >  Constants.MAX_MINOR_LENGTH)
             return "Email не может быть пустым и превышать 40 символов";
 
         return new Email(value.Trim());

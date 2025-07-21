@@ -1,45 +1,11 @@
-﻿using PetFamily.Domain.Requsites;
+using PetFamily.Domain.Requsites;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Pets;
 
 public class Pet : Entity<PetId>
 {
-    public string Name { get; private set; } = string.Empty;
-
-    public string Description { get; private set; }  = string.Empty;
-
-    public PetColor Color;
-
-    public string HealthInfo { get; private set; } = string.Empty;
-
-    public PetAddress PetAddress { get; private set; } = null!;
-
-    public double? Weight { get; private set; }
-
-    public double? Height { get; private set; }
-
-    public string OwnerPhone { get; private set; } = null!;
-
-    public bool Castrated { get; private set; }
-
-    public DateOnly? Birthday { get; private set; }
-
-    public bool? Vaccinated { get; private set; }
-
-    public PetStatus PetStatus { get; private set; } = PetStatus.LookingTreatment;
-
-    public DateTime CreatedAt { get; private set; }
-
-    public PetType PetType { get; private set; } = null!;
-
-
-    private readonly List<Requisites> _petRequisites = [];
-
-    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
-
-
-    private Pet(PetId id) :base (id) { }
+    private Pet(PetId id) : base(id) { }
 
     public Pet(
         PetId petId,
@@ -56,9 +22,9 @@ public class Pet : Entity<PetId>
         DateTime createdAt,
         PetStatus petStatus = PetStatus.LookingTreatment,
         IReadOnlyCollection<Requisites>? requisites = null
-        ) : base (petId)
+        ) : base(petId)
     {
-        Name = name; 
+        Name = name;
         Color = color;
         OwnerPhone = ownerPhone;
         Description = description ?? string.Empty;
@@ -72,6 +38,39 @@ public class Pet : Entity<PetId>
         CreatedAt = createdAt;
         CreatedAt = DateTime.UtcNow;
     }
+
+    public string Name { get; private set; } = string.Empty;
+
+    public string Description { get; private set; }  = string.Empty;
+
+    public PetColor Color;
+
+    public string HealthInfo { get; private set; } = string.Empty;
+
+    public PetAddress PetAddress { get; private set; } = null!;
+
+    public double? Weight { get; private set; }
+
+    public double? Height { get; private set; }
+
+    public Phone OwnerPhone { get; private set; } = null!;
+
+    public bool? Castrated { get; private set; }
+
+    public bool Vaccinated { get; private set; }
+
+    public DateOnly? Birthday { get; private set; }
+
+    public PetStatus PetStatus { get; private set; } = PetStatus.LookingTreatment;
+
+    public DateTime CreatedAt { get; private set; }
+
+    public PetType PetType { get; private set; } = null!;
+
+
+    private readonly List<Requisites> _petRequisites = [];
+
+    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
 
     public  Result<Requisites> AddRequisites(Requisites requisite)
     {

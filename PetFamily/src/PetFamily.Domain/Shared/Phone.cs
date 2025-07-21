@@ -1,6 +1,4 @@
-using PetFamily.Domain.Shared;
-
-namespace PetFamily.Domain.Volunteers;
+namespace PetFamily.Domain.Shared;
 
 public sealed record Phone
 {

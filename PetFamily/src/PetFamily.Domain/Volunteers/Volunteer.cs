@@ -6,35 +6,6 @@ namespace PetFamily.Domain.Volunteers;
 
 public class Volunteer : Entity<VolunteerId>
 {
-    public VolunteerFullName VolunteerFullName { get; private set; } = null!;
-
-    public Email Email { get; set; } = null!;
-
-    public string VolunteerInfo { get; set; } = string.Empty!;
-
-    public decimal ExperienceYears { get; set; } = decimal.Zero;
-
-    public Phone Phone { get; set; } = null!;
-
-    private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
-
-    public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
-
-
-    private readonly List<Requisites> _requisites = [];
-
-    public IReadOnlyCollection<Requisites> Requisites => _requisites.AsReadOnly();
-
-
-    private readonly List<Pet> _pets = [];
-
-    public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();
-
-
-    public int LookingTreatmentPets => CountPetsByStatus(PetStatus.LookingTreatment);
-    public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
-    public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
-
     private Volunteer(VolunteerId id) : base(id) { }
 
     public Volunteer(
@@ -54,7 +25,35 @@ public class Volunteer : Entity<VolunteerId>
         VolunteerInfo = volunteerInfo ?? string.Empty;
         ExperienceYears = experienceYears;
     }
+ 
+    public VolunteerFullName VolunteerFullName { get; private set; } = null!;
 
+    public Email Email { get; set; } = null!;
+
+    public Phone Phone { get; set; } = null!;
+
+    public string VolunteerInfo { get; set; } = string.Empty;
+
+    public decimal ExperienceYears { get; set; } = decimal.Zero;
+
+    private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
+
+    public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
+
+
+    private readonly List<Requisites> _volunteerRequisites = [];
+
+    public IReadOnlyCollection<Requisites> Requisites => _volunteerRequisites.AsReadOnly();
+
+
+    private readonly List<Pet> _pets = [];
+
+    public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();
+
+
+    public int LookingTreatmentPets => CountPetsByStatus(PetStatus.LookingTreatment);
+    public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
+    public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
 
     public Result AddPet(Pet pet)
     {
@@ -90,7 +89,7 @@ public class Volunteer : Entity<VolunteerId>
     }
 
 
-    public Result<Requisites> AddRequisite(Requisites requisite)  
+    public Result<Requisites> AddRequisites(Requisites requisite)  
     {
         if (requisite is null)
             return "Реквизит не может быть null";
@@ -98,8 +97,29 @@ public class Volunteer : Entity<VolunteerId>
         if (string.IsNullOrWhiteSpace(requisite.Title))
             return "Название реквизита не может быть пустым";
 
-        _requisites.Add(requisite);
+        _volunteerRequisites.Add(requisite);
         return requisite;
+    }
+
+    public Result RemoveRequisites(Requisites requisite)
+    {
+        if (requisite is null)
+            return "Реквизит не может быть null";
+
+        if (!_volunteerRequisites.Contains(requisite))
+            return "Реквизит не найден";
+
+        _volunteerRequisites.Remove(requisite);
+        return Result.Success();
+    }
+
+    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
+    {
+        var removeResult = RemoveRequisites(oldRequisite);
+        if (removeResult.IsFailure)
+            return removeResult;
+
+        return AddRequisites(newRequisite);
     }
 
 

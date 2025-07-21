@@ -16,8 +16,9 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasConversion(
             id => id.Value,
             value => VolunteerId.Create(value));
-
-        builder.OwnsOne(v => v.VolunteerFullName, name =>
+         
+        builder.OwnsOne(v => v.VolunteerFullName,
+            name =>
         {
             name.Property(n => n.FirstName).HasColumnName("first_name").IsRequired();
             name.Property(n => n.LastName).HasColumnName("last_name").IsRequired();
@@ -32,7 +33,8 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
                 .IsRequired(); // NOT NULL
         });
 
-        builder.OwnsOne(v => v.Phone, phone =>
+        builder.OwnsOne(v => v.Phone,
+            phone =>
         {
             phone.Property(p => p.Value)
                 .HasColumnName("phone")
@@ -41,9 +43,10 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
 
         builder.Property(v => v.VolunteerInfo)
             .HasColumnName("volunteer_info")
-           .HasMaxLength(Constants.MAX_MINOR_LENGTH);
+           .HasMaxLength(Constants.MAX_INFO_LENGTH);
 
-        builder.OwnsMany(v => v.VolunteerSocialMedias, sm =>
+        builder.OwnsMany(v => v.VolunteerSocialMedias,
+            sm =>
         {
             sm.ToJson();
             sm.Property(x => x.Title)
@@ -52,12 +55,13 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
         });
 
-        builder.OwnsMany(v => v.Requisites, vr =>
+        builder.OwnsMany(v => v.Requisites,
+            vr =>
         {
             vr.ToJson();
             vr.Property(x => x.Title)
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
-            vr.Property(x=> x.Value)
+            vr.Property(x => x.Value)
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
         });
 
@@ -66,5 +70,9 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasForeignKey("volunteer_id")
             .OnDelete(DeleteBehavior.NoAction);
 
+        builder.Property(v => v.ExperienceYears)
+            .HasColumnName("volunteer_exp_years")
+           .HasMaxLength(Constants.MAX_MINOR_LENGTH)
+           .IsRequired();   
     }
 }

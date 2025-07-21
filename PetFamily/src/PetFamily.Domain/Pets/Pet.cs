@@ -14,7 +14,7 @@ public class Pet : Entity<PetId>
         PetColor color,
         string healthInfo,
         PetAddress petAddress,
-        string ownerPhone,
+        Phone ownerPhone,
         bool vaccinated,
         double height,
         double weight,

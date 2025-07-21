@@ -13,9 +13,8 @@ public class Volunteer : Entity<VolunteerId>
            VolunteerFullName volunteerFullName,
            Email email,
            Phone phone,
-           string? middleName = null,
            string? volunteerInfo = null,
-           decimal experienceYears = 0)
+           decimal experienceYears = default)
 
         : base(volunteerId)
     {

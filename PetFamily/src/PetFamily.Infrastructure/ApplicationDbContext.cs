@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.Volunteers;
+using System.Reflection;
 
 namespace PetFamily.Infrastructure;
 
@@ -15,6 +16,11 @@ public class ApplicationDbContext(IConfiguration configuration) : DbContext
     {
         optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
+    }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 
     private ILoggerFactory CreateLoggerFactory() =>

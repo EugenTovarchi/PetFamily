@@ -10,12 +10,11 @@ public class Volunteer : Entity<VolunteerId>
 
     public Volunteer(
            VolunteerId volunteerId,
-           VolunteerFullName volunteerFullName,
+           FullName volunteerFullName,
            Email email,
            Phone phone,
-           string? middleName = null,
            string? volunteerInfo = null,
-           decimal experienceYears = 0)
+           decimal experienceYears = default)
 
         : base(volunteerId)
     {
@@ -26,7 +25,7 @@ public class Volunteer : Entity<VolunteerId>
         ExperienceYears = experienceYears;
     }
  
-    public VolunteerFullName VolunteerFullName { get; private set; } = null!;
+    public FullName VolunteerFullName { get; private set; } = null!;
 
     public Email Email { get; set; } = null!;
 

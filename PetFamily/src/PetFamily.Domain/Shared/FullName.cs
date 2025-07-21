@@ -1,10 +1,10 @@
-public  record VolunteerFullName
+public  record FullName
 {
     public string FirstName { get; } = string.Empty;
     public string LastName { get; } = string.Empty;
     public string? MiddleName { get; } 
 
-    private VolunteerFullName(string firstName, string lastName, string? middleName = null)
+    private FullName(string firstName, string lastName, string? middleName = null)
     {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new ArgumentException("Имя не может быть пустым", nameof(firstName));
@@ -17,16 +17,16 @@ public  record VolunteerFullName
         MiddleName = middleName?.Trim();
     }
 
-    public static VolunteerFullName Create(string firstName, string lastName)
+    public static FullName Create(string firstName, string lastName)
         => new(firstName, lastName);
 
-    public static VolunteerFullName CreateWithMiddle(string firstName, string lastName, string middleName)
+    public static FullName CreateWithMiddle(string firstName, string lastName, string middleName)
         => new(firstName, lastName, middleName);
 
-    public string FullName => MiddleName == null
+    public string GetFullName => MiddleName == null
         ? $"{FirstName} {LastName}"
         : $"{FirstName} {MiddleName} {LastName}";
 
     // Для EF Core 
-    private VolunteerFullName() { } 
+    private FullName() { } 
 }

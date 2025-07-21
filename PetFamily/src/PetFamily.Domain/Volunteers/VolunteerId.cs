@@ -1,6 +1,3 @@
-using PetFamily.Domain.Pets;
-using PetFamily.Domain.Volunteers;
-
 public record VolunteerId
 {
     private VolunteerId(Guid value) => Value = value;
@@ -12,9 +9,9 @@ public record VolunteerId
 
     public static VolunteerId Create(Guid id) => new(id);
 
-    //public static implicit operator Guid(VolunteerId volunteerId)
-    //{
-    //    ArgumentNullException.ThrowIfNull(volunteerId);
-    //    return volunteerId.Value;
-    //}
+    public static implicit operator Guid(VolunteerId volunteerId)
+    {
+        ArgumentNullException.ThrowIfNull(volunteerId);
+        return volunteerId.Value;
+    }
 }

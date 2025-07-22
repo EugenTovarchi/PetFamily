@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: petfamily_postgres
+    environment:
+      POSTGRES_DB: PetFamily
+      POSTGRES_USER: postgresUser
+      POSTGRES_PASSWORD: postgresPassword
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: ${DOCKER_REGISTRY-}petfamilyapi
+    build:
+      context: .
+      dockerfile: src/PetFamily.API/Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=PetFamily;Username=postgres;Password=yourStrongPassword123
+
+volumes:
+  postgres_data:

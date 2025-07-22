@@ -1,55 +1,20 @@
-﻿using CSharpFunctionalExtensions;
-using PetFamily.Domain.Pets.Species;
 using PetFamily.Domain.Requsites;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Pets;
 
-public class Pet
+public class Pet : Entity<PetId>
 {
-    public Guid Id { get; set; }
-    public string Name { get; private set; } = string.Empty;
-
-    public string Description { get; private set; }  = string.Empty;
-
-    public PetColor Color;
-
-    public string HealthInfo { get; private set; } = string.Empty;
-
-    public string PetAddress { get; private set; } = string.Empty;
-
-    public double? Weight { get; private set; }
-
-    public double? Height { get; private set; }
-
-    public string OwnerPhone { get; private set; } = null!;
-
-    public bool Castrated { get; private set; }
-
-    public DateOnly? Birthday { get; private set; }
-
-    public bool? Vaccinated { get; private set; }
-
-    public PetStatus PetStatus { get; private set; } = PetStatus.LookingTreatment;
-
-    public DateTime CreatedAt { get; private set; }
-
-    public PetType PetType { get; private set; } = null!;
-
-
-    private readonly List<Requisites> _petRequisites = [];
-
-    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
-
-
-    private Pet() { }
+    private Pet(PetId id) : base(id) { }
 
     public Pet(
+        PetId petId,
         string name,
         string description,
         PetColor color,
         string healthInfo,
-        string petAddress,
-        string ownerPhone,
+        PetAddress petAddress,
+        Phone ownerPhone,
         bool vaccinated,
         double height,
         double weight,
@@ -57,9 +22,9 @@ public class Pet
         DateTime createdAt,
         PetStatus petStatus = PetStatus.LookingTreatment,
         IReadOnlyCollection<Requisites>? requisites = null
-        )
+        ) : base(petId)
     {
-        Name = name; 
+        Name = name;
         Color = color;
         OwnerPhone = ownerPhone;
         Description = description ?? string.Empty;
@@ -74,25 +39,58 @@ public class Pet
         CreatedAt = DateTime.UtcNow;
     }
 
-    public  Result AddRequisites(Requisites requisite)
+    public string Name { get; private set; } = string.Empty;
+
+    public string Description { get; private set; }  = string.Empty;
+
+    public PetColor Color;
+
+    public string HealthInfo { get; private set; } = string.Empty;
+
+    public PetAddress PetAddress { get; private set; } = null!;
+
+    public double? Weight { get; private set; }
+
+    public double? Height { get; private set; }
+
+    public Phone OwnerPhone { get; private set; } = null!;
+
+    public bool? Castrated { get; private set; }
+
+    public bool Vaccinated { get; private set; }
+
+    public DateOnly? Birthday { get; private set; }
+
+    public PetStatus PetStatus { get; private set; } = PetStatus.LookingTreatment;
+
+    public DateTime CreatedAt { get; private set; }
+
+    public PetType PetType { get; private set; } = null!;
+
+
+    private readonly List<Requisites> _petRequisites = [];
+
+    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
+
+    public  Result<Requisites> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
-             return Result.Failure<Requisites>("Реквизиты не найдены!");
+             return "Реквизиты не найдены!";
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return Result.Failure("Название реквизита не может быть пустым");
+            return "Название реквизита не может быть пустым";
 
         _petRequisites.Add(requisite);
-        return Result.Success(requisite);
+        return requisite;
     }
 
     public Result RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
-            return Result.Failure("Реквизит не может быть null");
+            return "Реквизит не может быть null";
 
         if (!_petRequisites.Contains(requisite))
-            return Result.Failure("Реквизит не найден");
+            return "Реквизит не найден";
 
         _petRequisites.Remove(requisite);
         return Result.Success();

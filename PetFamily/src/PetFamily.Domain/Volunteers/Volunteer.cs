@@ -1,38 +1,51 @@
-﻿using CSharpFunctionalExtensions;
 using PetFamily.Domain.Pets;
 using PetFamily.Domain.Requsites;
+using PetFamily.Domain.Shared;
 
 namespace PetFamily.Domain.Volunteers;
 
-public class Volunteer
+public class Volunteer : Entity<VolunteerId>
 {
-    public Guid Id { get; set; }
+    private Volunteer(VolunteerId id) : base(id) { }
 
-    public string FirstName { get; set; } = null!;
+    public Volunteer(
+           VolunteerId volunteerId,
+           VolunteerFullName volunteerFullName,
+           Email email,
+           Phone phone,
+           string? volunteerInfo = null,
+           decimal experienceYears = default)
 
-    public string MiddleName { get; set; } = string.Empty;
+        : base(volunteerId)
+    {
+        VolunteerFullName = volunteerFullName;
+        Email = email;
+        Phone = phone;
+        VolunteerInfo = volunteerInfo ?? string.Empty;
+        ExperienceYears = experienceYears;
+    }
+ 
+    public VolunteerFullName VolunteerFullName { get; private set; } = null!;
 
-    public string LastName { get; set; } = null!;
+    public Email Email { get; set; } = null!;
 
-    public string Email { get; set; } = null!;
+    public Phone Phone { get; set; } = null!;
 
-    public string VolunteerInfo { get; set; } = string.Empty!;
+    public string VolunteerInfo { get; set; } = string.Empty;
 
     public decimal ExperienceYears { get; set; } = decimal.Zero;
 
-    public string Phone { get; set; } = null!;
-
-    private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = new();
+    private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
 
     public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
 
 
-    private readonly List<Requisites> _requisites = [];
+    private readonly List<Requisites> _volunteerRequisites = [];
 
-    public IReadOnlyCollection<Requisites> Requisites => _requisites.AsReadOnly();
+    public IReadOnlyCollection<Requisites> Requisites => _volunteerRequisites.AsReadOnly();
 
 
-    private readonly List<Pet> _pets = new();
+    private readonly List<Pet> _pets = [];
 
     public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();
 
@@ -41,34 +54,13 @@ public class Volunteer
     public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
     public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
 
-    private Volunteer() { }
-
-    public Volunteer(
-           string firstName,
-           string lastName,
-           string email,
-           string phone,
-           string? middleName = null,
-           string? volunteerInfo = null,
-           decimal experienceYears = 0)
-    {
-        FirstName = firstName;
-        LastName = lastName;
-        MiddleName = middleName ?? string.Empty;
-        Email = email;
-        Phone = phone;
-        VolunteerInfo = volunteerInfo ?? string.Empty;
-        ExperienceYears = experienceYears;
-    }
-
-
     public Result AddPet(Pet pet)
     {
         if (pet == null)
-            return Result.Failure("Питомец не может иметь значение null");
+            return "Питомец не может иметь значение null";
 
         if (_pets.Contains(pet))
-            return Result.Failure("Этот питомец уже закреплён за волонтёром");
+            return "Этот питомец уже закреплён за волонтёром";
 
         _pets.Add(pet);
         return Result.Success();
@@ -77,10 +69,10 @@ public class Volunteer
     public Result RemovePet(Pet pet)
     {
         if (pet is null)
-            return Result.Failure("Реквизит не может быть null");
+            return "Реквизит не может быть null";
 
         if (!_pets.Contains(pet))
-            return Result.Failure("Реквизит не найден");
+            return "Реквизит не найден";
 
         _pets.Remove(pet);
         return Result.Success();
@@ -96,26 +88,47 @@ public class Volunteer
     }
 
 
-    public Result AddRequisite(Requisites requisite)  // получается дублирование кода тут и в классе Pet - это ок ? не понятна связь
+    public Result<Requisites> AddRequisites(Requisites requisite)  
     {
         if (requisite is null)
-            return Result.Failure("Реквизит не может быть null");
+            return "Реквизит не может быть null";
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return Result.Failure("Название реквизита не может быть пустым");
+            return "Название реквизита не может быть пустым";
 
-        _requisites.Add(requisite);
+        _volunteerRequisites.Add(requisite);
+        return requisite;
+    }
+
+    public Result RemoveRequisites(Requisites requisite)
+    {
+        if (requisite is null)
+            return "Реквизит не может быть null";
+
+        if (!_volunteerRequisites.Contains(requisite))
+            return "Реквизит не найден";
+
+        _volunteerRequisites.Remove(requisite);
         return Result.Success();
+    }
+
+    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
+    {
+        var removeResult = RemoveRequisites(oldRequisite);
+        if (removeResult.IsFailure)
+            return removeResult;
+
+        return AddRequisites(newRequisite);
     }
 
 
     public Result AddSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
-            return Result.Failure("Соцсеть не может быть null");
+            return "Соцсеть не может быть null";
 
         if (_volunteerSocialMedias.Any(s => s.Title == socialMedia.Title))
-            return Result.Failure($"Соцсеть {socialMedia.Title} уже добавлена");
+            return $"Соцсеть {socialMedia.Title} уже добавлена";
 
         _volunteerSocialMedias.Add(socialMedia);
         return Result.Success();
@@ -123,10 +136,10 @@ public class Volunteer
     public Result RemoveSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
-            return Result.Failure("Соцсеть не может быть null");
+            return "Соцсеть не может быть null";
 
         if (!_volunteerSocialMedias.Contains(socialMedia))
-            return Result.Failure("Соцсеть не найдена");
+            return "Соцсеть не найдена";
 
         _volunteerSocialMedias.Remove(socialMedia);
         return Result.Success();
@@ -139,5 +152,4 @@ public class Volunteer
 
         return _pets.Count(p => p.PetStatus == status);
     }
-
 }

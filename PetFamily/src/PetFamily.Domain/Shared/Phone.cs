@@ -9,8 +9,11 @@ public sealed record Phone
 
     public static Result<Phone> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value) && value.Length > MAX_MAIL_LENGTH)
-            return "Номер телефона не может быть пустым и превышать 30 символов";
+        if (string.IsNullOrWhiteSpace(value) )
+            return Errors.General.ValueIsInvalid("phone");
+
+        if(value.Length > MAX_MAIL_LENGTH)
+            return Errors.General.ValueIsRequired("phone");
 
         return new Phone(value.Trim());
     }

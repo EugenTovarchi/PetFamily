@@ -1,4 +1,4 @@
-﻿using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared;
 using System.Collections.ObjectModel;
 
 namespace PetFamily.Domain.Pets.Species;
@@ -18,13 +18,13 @@ public  class Species
     public Result<Breed> AddBreed(Breed breed)
     {
         if (breed is null)
-            return "Порода не найдена!";
+            return  Errors.General.ValueIsInvalid("breed");
 
         if (string.IsNullOrWhiteSpace(breed.Title))
-            return "Порода не может быть пустой";
+            return Errors.General.ValueIsInvalid("breed");
 
         if (Title.Length> 100)
-            return "Название породы слишком длинное";
+            return Errors.General.ValueIsRequired("breed");
 
         _breeds.Add(breed);
         return breed;
@@ -33,10 +33,10 @@ public  class Species
     public Result RemoveBreed(Breed breed)
     {
         if (breed is null)
-            return "Порода не может быть null";
+            return Errors.General.ValueIsInvalid("breed");
 
         if (!_breeds.Contains(breed))
-            return "Порода не найдена";
+            return Errors.General.NotFoundValue("breed");
 
         _breeds.Remove(breed);
         return Result.Success();

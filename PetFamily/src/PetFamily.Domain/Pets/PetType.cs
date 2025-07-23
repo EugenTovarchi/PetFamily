@@ -15,8 +15,11 @@ public record PetType
 
     public static Result<PetType> Create(Guid speciesId, Guid breedId)
     {
-        if (speciesId == Guid.Empty || breedId == Guid.Empty)
-            return "ID не могут быть пустыми";
+        if (speciesId == Guid.Empty)
+            return Errors.General.EmptyId(speciesId);
+
+        if(breedId == Guid.Empty)
+            return Errors.General.EmptyId(breedId);
 
         return new PetType(speciesId, breedId);
     }

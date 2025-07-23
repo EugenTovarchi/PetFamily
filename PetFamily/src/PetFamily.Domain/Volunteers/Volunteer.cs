@@ -57,10 +57,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result AddPet(Pet pet)
     {
         if (pet == null)
-            return "Питомец не может иметь значение null";
+            return Errors.General.ValueIsInvalid("pet");
 
         if (_pets.Contains(pet))
-            return "Этот питомец уже закреплён за волонтёром";
+            return Errors.General.Duplicate("pet");
 
         _pets.Add(pet);
         return Result.Success();
@@ -69,10 +69,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result RemovePet(Pet pet)
     {
         if (pet is null)
-            return "Реквизит не может быть null";
+            return Errors.General.ValueIsInvalid("pet");
 
         if (!_pets.Contains(pet))
-            return "Реквизит не найден";
+            return Errors.General.NotFound(pet.Id);
 
         _pets.Remove(pet);
         return Result.Success();
@@ -91,10 +91,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result<Requisites> AddRequisites(Requisites requisite)  
     {
         if (requisite is null)
-            return "Реквизит не может быть null";
+            return Errors.General.ValueIsInvalid("requisite");
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return "Название реквизита не может быть пустым";
+            return Errors.General.ValueIsInvalid("Title");
 
         _volunteerRequisites.Add(requisite);
         return requisite;
@@ -103,10 +103,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
-            return "Реквизит не может быть null";
+            return Errors.General.ValueIsInvalid("requisite");
 
         if (!_volunteerRequisites.Contains(requisite))
-            return "Реквизит не найден";
+            return Errors.General.NotFoundValue("requisite");
 
         _volunteerRequisites.Remove(requisite);
         return Result.Success();
@@ -125,10 +125,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result AddSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
-            return "Соцсеть не может быть null";
+            return Errors.General.ValueIsInvalid("socialMedia");
 
         if (_volunteerSocialMedias.Any(s => s.Title == socialMedia.Title))
-            return $"Соцсеть {socialMedia.Title} уже добавлена";
+            return Errors.General.Duplicate("socialMedia.Title");  
 
         _volunteerSocialMedias.Add(socialMedia);
         return Result.Success();
@@ -136,10 +136,10 @@ public class Volunteer : Entity<VolunteerId>
     public Result RemoveSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
-            return "Соцсеть не может быть null";
+            return Errors.General.ValueIsInvalid("socialMedia");
 
         if (!_volunteerSocialMedias.Contains(socialMedia))
-            return "Соцсеть не найдена";
+            return Errors.General.NotFoundValue("socialMedia.Title");
 
         _volunteerSocialMedias.Remove(socialMedia);
         return Result.Success();

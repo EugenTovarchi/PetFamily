@@ -94,7 +94,7 @@ public class Volunteer : Entity<VolunteerId>
             return Errors.General.ValueIsInvalid("requisite");
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return Errors.General.ValueIsInvalid("Title");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("Title");
 
         _volunteerRequisites.Add(requisite);
         return requisite;

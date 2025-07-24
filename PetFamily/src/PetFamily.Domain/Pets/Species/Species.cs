@@ -21,7 +21,7 @@ public  class Species
             return  Errors.General.ValueIsInvalid("breed");
 
         if (string.IsNullOrWhiteSpace(breed.Title))
-            return Errors.General.ValueIsInvalid("breed");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("breed");
 
         if (Title.Length> 100)
             return Errors.General.ValueIsRequired("breed");

@@ -26,13 +26,13 @@ public record PetAddress
         uint flat)
     {
         if (string.IsNullOrWhiteSpace(city))
-            return Errors.General.ValueIsInvalid("city");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("city");
 
         if (city.Length > MAX_LENGTH)
             return Errors.General.ValueIsRequired("city");
 
         if (string.IsNullOrWhiteSpace(street))
-            return Errors.General.ValueIsInvalid("street");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("street");
 
         if (street.Length > MAX_LENGTH)
             return Errors.General.ValueIsRequired("street");

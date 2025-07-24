@@ -10,7 +10,7 @@ public sealed record Phone
     public static Result<Phone> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value) )
-            return Errors.General.ValueIsInvalid("phone");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("phone");
 
         if(value.Length > MAX_MAIL_LENGTH)
             return Errors.General.ValueIsRequired("phone");

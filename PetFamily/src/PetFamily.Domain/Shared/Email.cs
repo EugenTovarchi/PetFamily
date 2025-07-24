@@ -11,7 +11,7 @@ public sealed record Email
     public static Result<Email> Create(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Errors.General.ValueIsInvalid("email");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("email");
 
 
         if (value.Length > Constants.MAX_MINOR_LENGTH)

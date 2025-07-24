@@ -78,7 +78,7 @@ public class Pet : Entity<PetId>
              return Errors.General.ValueIsInvalid("requisite");
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return Errors.General.ValueIsInvalid("Title");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("Title");
 
         _petRequisites.Add(requisite);
         return requisite;

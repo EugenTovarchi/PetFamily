@@ -8,9 +8,6 @@ public record FullName
 
     private FullName(string firstName, string lastName, string? middleName = null)
     {
-        
-
-       
         FirstName = firstName.Trim();
         LastName = lastName.Trim();
         MiddleName = middleName?.Trim();
@@ -19,10 +16,10 @@ public record FullName
     public static Result<FullName> Create(string firstName, string lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName))
-            return Errors.General.ValueIsInvalid("firstName");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("firstName");
 
         if (string.IsNullOrWhiteSpace(lastName))
-            return Errors.General.ValueIsInvalid("lastName");
+            return Errors.General.ValueIsEmptyOrWhiteSpace("lastName");
 
         return new FullName(firstName, lastName);
     }

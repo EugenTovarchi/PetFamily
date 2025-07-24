@@ -26,6 +26,11 @@ public static class Errors
             return Error.Validation("length.is.invalid", $"invalid {label} length");
         }
 
+        public static Error ValueIsEmptyOrWhiteSpace(string field)
+        {
+            return Error.Validation("value.is.empty", $"invalid {field} is empty or white space");
+        }
+
         public static Error Duplicate(string field)
         {
             return Error.Conflict("field.duplicate", $"{field} already exists");
@@ -41,5 +46,13 @@ public static class Errors
             return Error.Validation("value.is.zero", $"{field} can not be zero.");
         }
 
+    }
+
+    public static class Volunteer
+    {
+        public static Error ValueMustBePositive(string field)
+        {
+            return Error.Validation("value.not.positive", $"{field} can not be negative.");
+        }
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using PetFamily.Infrastructure;
 
 namespace PetFamily.API;
@@ -14,6 +15,11 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
 
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "PetFamily", Version = "v1" });
+        });
+
         builder.Services
             .AddApplication()
             .AddInfrastructure();
@@ -24,6 +30,11 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetFamily v1");
+            });
         }
 
         app.UseHttpsRedirection();

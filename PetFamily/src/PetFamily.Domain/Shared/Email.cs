@@ -1,4 +1,5 @@
 using PetFamily.Infrastructure.Configurations;
+using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared;
 

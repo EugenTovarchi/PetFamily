@@ -31,10 +31,6 @@ public class VolunteersRepository : IVolunteersRepository
     {
         var volunteer = await _dbContext.Volunteers
             .Include(v=>v.Pets)
-            .Include(v=>v.Phone)
-            .Include(v=>v.Email)
-            .Include(v=>v.VolunteerFullName)
-            .Include(v=>v.VolunteerSocialMedias)
             .FirstOrDefaultAsync(v=>v.Id==volunteerId,cancellationToken);
 
         if (volunteer is null)
@@ -47,8 +43,6 @@ public class VolunteersRepository : IVolunteersRepository
     {
         var volunteer = await _dbContext.Volunteers
             .Include(v => v.Pets)
-            .Include(v => v.Phone)
-            .Include(v => v.VolunteerFullName)
             .FirstOrDefaultAsync(v =>
                     v.VolunteerFullName.FirstName == firstName &&
                     v.VolunteerFullName.LastName == lastName &&

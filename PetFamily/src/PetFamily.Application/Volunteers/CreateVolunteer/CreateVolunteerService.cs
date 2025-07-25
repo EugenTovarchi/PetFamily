@@ -10,7 +10,7 @@ public class CreateVolunteerService
     {
         _repository = repository;
     }
-    public async Task<Result<Guid>> Add(CreateVolunteerRequest request, CancellationToken cancellationToken = default)
+    public async Task <Result<Guid>> Handle(CreateVolunteerRequest request, CancellationToken cancellationToken = default)
     {
         if (request is null)
             return Errors.General.ValueIsInvalid("request");

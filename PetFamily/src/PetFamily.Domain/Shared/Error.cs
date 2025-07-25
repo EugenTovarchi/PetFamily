@@ -4,9 +4,9 @@ public record Error
 {
     public string Code { get; }  //машинно-читаемый идентификатор ошибки
     public string Message { get; }  //человеко-читаемое описание
-    public ErrorType Type { get; }
+    public ErrorType? Type { get; }
 
-    private Error(string code, string message, ErrorType type)
+    private Error(string code, string message, ErrorType? type)
     {
         Code = code;
         Message = message;

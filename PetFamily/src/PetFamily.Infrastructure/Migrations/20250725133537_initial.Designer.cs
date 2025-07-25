@@ -13,7 +13,7 @@ using PetFamily.Infrastructure;
 namespace PetFamily.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250722084941_initial")]
+    [Migration("20250725133537_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -225,7 +225,26 @@ namespace PetFamily.Infrastructure.Migrations
 
             modelBuilder.Entity("PetFamily.Domain.Volunteers.Volunteer", b =>
                 {
-                    b.OwnsOne("FullName", "VolunteerFullName", b1 =>
+                    b.OwnsOne("PetFamily.Domain.Shared.Email", "Email", b1 =>
+                        {
+                            b1.Property<Guid>("VolunteerId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasMaxLength(40)
+                                .HasColumnType("character varying(40)")
+                                .HasColumnName("email");
+
+                            b1.HasKey("VolunteerId");
+
+                            b1.ToTable("volunteers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VolunteerId");
+                        });
+
+                    b.OwnsOne("PetFamily.Domain.Shared.FullName", "VolunteerFullName", b1 =>
                         {
                             b1.Property<Guid>("VolunteerId")
                                 .HasColumnType("uuid");
@@ -243,25 +262,6 @@ namespace PetFamily.Infrastructure.Migrations
                             b1.Property<string>("MiddleName")
                                 .HasColumnType("text")
                                 .HasColumnName("middle_name");
-
-                            b1.HasKey("VolunteerId");
-
-                            b1.ToTable("volunteers");
-
-                            b1.WithOwner()
-                                .HasForeignKey("VolunteerId");
-                        });
-
-                    b.OwnsOne("PetFamily.Domain.Shared.Email", "Email", b1 =>
-                        {
-                            b1.Property<Guid>("VolunteerId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(40)
-                                .HasColumnType("character varying(40)")
-                                .HasColumnName("email");
 
                             b1.HasKey("VolunteerId");
 

@@ -75,10 +75,10 @@ public class Pet : Entity<PetId>
     public  Result<Requisites> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
-             return "Реквизиты не найдены!";
+             return Errors.General.ValueIsInvalid("requisite");
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
-            return "Название реквизита не может быть пустым";
+            return Errors.General.ValueIsEmptyOrWhiteSpace("Title");
 
         _petRequisites.Add(requisite);
         return requisite;
@@ -87,10 +87,10 @@ public class Pet : Entity<PetId>
     public Result RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
-            return "Реквизит не может быть null";
+            return Errors.General.ValueIsInvalid("requisite");
 
         if (!_petRequisites.Contains(requisite))
-            return "Реквизит не найден";
+            return Errors.General.NotFoundValue("requisite.Title");
 
         _petRequisites.Remove(requisite);
         return Result.Success();

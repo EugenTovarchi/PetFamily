@@ -36,7 +36,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .HasMaxLength(Constants.MAX_INFO_LENGTH)
             .IsRequired();
 
-        builder.OwnsOne(p => p.PetAddress, address =>
+        builder.ComplexProperty(p => p.PetAddress, address =>    //можно использовать OwnsOne> но Complex указывает на VO
         {
             address.Property(a => a.City).HasColumnName("city").IsRequired();
             address.Property(a => a.Street).HasColumnName("street").IsRequired();
@@ -99,7 +99,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.OwnsMany(p => p.PetRequisites, pr =>
         {
-            pr.ToJson();
+            pr.ToJson("pet_requisites"); 
             pr.Property(x => x.Title)
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
             pr.Property(x => x.Value)

@@ -48,7 +48,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.OwnsMany(v => v.VolunteerSocialMedias,
             sm =>
         {
-            sm.ToJson();
+            sm.ToJson("volunteer_social_media");
             sm.Property(x => x.Title)
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
             sm.Property(x => x.Url)
@@ -58,7 +58,7 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
         builder.OwnsMany(v => v.Requisites,
             vr =>
         {
-            vr.ToJson();
+            vr.ToJson("volunteer_requisites");
             vr.Property(x => x.Title)
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
             vr.Property(x => x.Value)

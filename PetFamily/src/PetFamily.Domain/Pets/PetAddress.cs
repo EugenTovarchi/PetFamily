@@ -25,14 +25,20 @@ public record PetAddress
         uint house,
         uint flat)
     {
-        if (string.IsNullOrWhiteSpace(city) && city.Length > MAX_LENGTH)
-            return "Город не может быть пустым и превышать 100 символов";
+        if (string.IsNullOrWhiteSpace(city))
+            return Errors.General.ValueIsEmptyOrWhiteSpace("city");
 
-        if (string.IsNullOrWhiteSpace(street) && street.Length > MAX_LENGTH)
-            return "Улица не может быть пустой и превышать 100 символов";
+        if (city.Length > MAX_LENGTH)
+            return Errors.General.ValueIsRequired("city");
+
+        if (string.IsNullOrWhiteSpace(street))
+            return Errors.General.ValueIsEmptyOrWhiteSpace("street");
+
+        if (street.Length > MAX_LENGTH)
+            return Errors.General.ValueIsRequired("street");
 
         if (house == 0)
-            return "Номер дома должен быть положительным числом";
+            return Errors.General.ValueIsZero("house");
 
         return new PetAddress(
             city.Trim(),

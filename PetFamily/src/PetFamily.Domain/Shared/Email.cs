@@ -1,4 +1,5 @@
 using PetFamily.Infrastructure.Configurations;
+using CSharpFunctionalExtensions;
 
 namespace PetFamily.Domain.Shared;
 
@@ -10,8 +11,12 @@ public sealed record Email
 
     public static Result<Email> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value) && value.Length >  Constants.MAX_MINOR_LENGTH)
-            return "Email не может быть пустым и превышать 40 символов";
+        if (string.IsNullOrWhiteSpace(value))
+            return Errors.General.ValueIsEmptyOrWhiteSpace("email");
+
+
+        if (value.Length > Constants.MAX_MINOR_LENGTH)
+            return Errors.General.ValueIsRequired("email");
 
         return new Email(value.Trim());
     }

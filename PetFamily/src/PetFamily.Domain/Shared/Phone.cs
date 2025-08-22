@@ -4,17 +4,17 @@ namespace PetFamily.Domain.Shared;
 
 public sealed record Phone
 {
-    private const int MAX_MAIL_LENGTH = 30;
+    private const int MAX_PHONE_LENGTH = 12;
     public string Value { get; } = null!;
 
     private Phone(string value) => Value = value;
 
     public static Result<Phone> Create(string value)
     {
-        if (string.IsNullOrWhiteSpace(value) )
+        if (string.IsNullOrWhiteSpace(value))
             return Errors.General.ValueIsEmptyOrWhiteSpace("phone");
 
-        if(value.Length > MAX_MAIL_LENGTH)
+        if(value.Length > MAX_PHONE_LENGTH)
             return Errors.General.ValueIsRequired("phone");
 
         return new Phone(value.Trim());

@@ -1,3 +1,5 @@
+using Shared;
+
 namespace PetFamily.Domain.Shared;
 
 public sealed record Phone

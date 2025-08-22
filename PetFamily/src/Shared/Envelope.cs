@@ -1,6 +1,4 @@
-using PetFamily.Domain.Shared;
-
-namespace PetFamily.API.Response;
+namespace Shared;
 
 public record Envelope
 {

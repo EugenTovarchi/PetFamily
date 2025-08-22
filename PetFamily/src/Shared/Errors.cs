@@ -46,15 +46,14 @@ public static class Errors
             return Error.Validation("value.is.zero", $"{field} can not be zero.");
         }
 
+        public static Error ValueMustBePositive(string field)
+        {
+            return Error.Validation("value.not.positive", $"{field} can not be negative.");
+        }
     }
 
     public static class Volunteer
     {
-        public static Error ValueMustBePositive(string field )
-        {
-            return Error.Validation("value.not.positive", $"{field} can not be negative.");
-        }
-
         public static Error CreateError(string? field = null)
         {
             return Error.Validation("entity.not.created", $"{field} has problem.");

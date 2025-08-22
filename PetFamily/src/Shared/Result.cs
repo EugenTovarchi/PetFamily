@@ -1,4 +1,4 @@
-namespace PetFamily.Domain.Shared;
+namespace Shared;
 
 public class Result
 {
@@ -37,7 +37,7 @@ public class Result
     public static implicit operator Result(Error error) => Failure(error);
 }
 
-public class Result<TValue> : Result
+public sealed class Result<TValue> : Result
 {
     private readonly TValue? _value;
 
@@ -65,5 +65,6 @@ public class Result<TValue> : Result
     }
 
     public static implicit operator Result<TValue>(TValue value) => Success(value);
-    public static implicit operator Result<TValue>(Error error) => Failure(error);
+    public static implicit operator Result<TValue>(Error error) => Failure(error); 
+
 }

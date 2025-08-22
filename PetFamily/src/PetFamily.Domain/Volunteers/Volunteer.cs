@@ -1,6 +1,7 @@
 using PetFamily.Domain.Pets;
 using PetFamily.Domain.Requsites;
 using PetFamily.Domain.Shared;
+using Shared;
 
 namespace PetFamily.Domain.Volunteers;
 

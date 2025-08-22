@@ -1,5 +1,6 @@
 using PetFamily.Domain.Requsites;
 using PetFamily.Domain.Shared;
+using Shared;
 
 namespace PetFamily.Domain.Pets;
 
@@ -71,7 +72,7 @@ public class Pet : Entity<PetId>
     private readonly List<Requisites> _petRequisites = [];
 
     public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
-
+    
     public  Result<Requisites> AddRequisites(Requisites requisite)
     {
         if (requisite is null)

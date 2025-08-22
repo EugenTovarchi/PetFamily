@@ -1,5 +1,5 @@
-using PetFamily.Domain.Shared;
 using PetFamily.Domain.Volunteers;
+using Shared;
 
 namespace PetFamily.Application.Volunteers;
 

@@ -1,4 +1,4 @@
-using PetFamily.Domain.Shared;
+using Shared;
 
 namespace PetFamily.Domain.Volunteers;
 

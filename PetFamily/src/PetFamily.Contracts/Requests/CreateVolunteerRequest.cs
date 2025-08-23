@@ -3,7 +3,7 @@ using PetFamily.Contracts.Dtos;
 namespace PetFamily.Contracts.Requests;
 
 public record CreateVolunteerRequest(
-    string  FirstName,
+    string FirstName,
     string LastName,
     string? MiddleName,
     string Phone,
@@ -11,6 +11,5 @@ public record CreateVolunteerRequest(
     string VolunteerInfo,
     decimal ExperienceYears,
     IEnumerable<VolunteerSocialMediaDto>? VolunteerSocialMediaDtos,
-    IEnumerable<RequisitesDto>? RequisitesDtos); 
+    IEnumerable<RequisitesDto>? RequisitesDtos);
 
- 

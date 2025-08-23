@@ -42,7 +42,7 @@ public class Pet : Entity<PetId>
 
     public string Name { get; private set; } = string.Empty;
 
-    public string Description { get; private set; }  = string.Empty;
+    public string Description { get; private set; } = string.Empty;
 
     public PetColor Color;
 
@@ -72,11 +72,11 @@ public class Pet : Entity<PetId>
     private readonly List<Requisites> _petRequisites = [];
 
     public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
-    
-    public  Result<Requisites> AddRequisites(Requisites requisite)
+
+    public Result<Requisites> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
-             return Errors.General.ValueIsInvalid("requisite");
+            return Errors.General.ValueIsInvalid("requisite");
 
         if (string.IsNullOrWhiteSpace(requisite.Title))
             return Errors.General.ValueIsEmptyOrWhiteSpace("Title");

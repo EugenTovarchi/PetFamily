@@ -25,7 +25,7 @@ public class Volunteer : Entity<VolunteerId>
         VolunteerInfo = volunteerInfo ?? string.Empty;
         ExperienceYears = experienceYears;
     }
- 
+
     public FullName VolunteerFullName { get; private set; } = null!;
 
     public Email Email { get; set; } = null!;
@@ -89,7 +89,7 @@ public class Volunteer : Entity<VolunteerId>
     }
 
 
-    public Result<Requisites> AddRequisites(Requisites requisite)  
+    public Result<Requisites> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -129,7 +129,7 @@ public class Volunteer : Entity<VolunteerId>
             return Errors.General.ValueIsInvalid("socialMedia");
 
         if (_volunteerSocialMedias.Any(s => s.Title == socialMedia.Title))
-            return Errors.General.Duplicate("socialMedia.Title");  
+            return Errors.General.Duplicate("socialMedia.Title");
 
         _volunteerSocialMedias.Add(socialMedia);
         return Result.Success();

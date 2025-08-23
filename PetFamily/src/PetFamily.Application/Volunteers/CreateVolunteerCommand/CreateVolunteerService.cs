@@ -36,26 +36,30 @@ public class CreateVolunteerService
             return Errors.General.Duplicate("existVolunteer");
 
 
-        var fullNameResult = command.Request.MiddleName is null
+        var fullName = command.Request.MiddleName is null
         ? FullName.Create(command.Request.FirstName, command.Request.LastName)
         : FullName.CreateWithMiddle(command.Request.FirstName, command.Request.LastName, command.Request.MiddleName);
 
         var volunteerId = VolunteerId.NewVolunteerId();
 
-        var phoneResult = Phone.Create(command.Request.Phone);
-        if (phoneResult.IsFailure)
-            return phoneResult.Error;
+        var phone = Phone.Create(command.Request.Phone).Value;
+        
+        var email = Email.Create(command.Request.Email).Value;
 
-        var emailResult = Email.Create(command.Request.Email);
-        if (emailResult.IsFailure)
-            return emailResult.Error;
+        //Не стал добавлять т.к. это не обязательные вещи при создании Волонтера( у него может не быть сразу реквизитов или соц сетей)
+
+        //var socialMedias = command.Request.VolunteerSocialMediaDtos
+        //    .Select(sm => VolunteerSocialMedia.Create(sm.Title, sm.Url)).ToList();
+
+        //var requisites = command.Request.RequisitesDtos
+        //    .Select(sm => Requisites.Create(sm.Title, sm.Instruction, sm.Value)).ToList();
 
         var volunteer = new Volunteer
         (
             volunteerId,
-            fullNameResult.Value,
-            emailResult.Value,
-            phoneResult.Value,
+            fullName.Value,
+            email,
+            phone,
             command.Request.VolunteerInfo,
             command.Request.ExperienceYears
         );

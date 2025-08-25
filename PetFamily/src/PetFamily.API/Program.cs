@@ -1,6 +1,7 @@
 using Microsoft.OpenApi.Models;
+using PetFamily.API.Middlewares;
 using PetFamily.Infrastructure;
-using System.Threading.Tasks;
+using Serilog;
 
 namespace PetFamily.API;
 
@@ -10,7 +11,18 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Handle services to the container.
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .Enrich.WithEnvironmentName()
+            .WriteTo.Console()
+            .WriteTo.Debug()
+            .WriteTo.File(path: Path.Combine("logs", "log-.txt"),
+                        rollingInterval: RollingInterval.Day, //создается каждый день новый файл
+                        retainedFileCountLimit: 7, // хранить логи за 7 дней, с 8го начнут заменяться
+                        rollOnFileSizeLimit: true) //когда дойдет до лимита размера файла, создасться новый того же дня.
+            .CreateLogger();
+
+        builder.Services.AddSerilog();
 
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -39,6 +51,10 @@ public class Program
 
             await app.ApplyMigrations();
         }
+        
+        app.UseSerilogRequestLogging();
+
+        app.UseExceptionMiddleware();
 
         app.UseHttpsRedirection();
 

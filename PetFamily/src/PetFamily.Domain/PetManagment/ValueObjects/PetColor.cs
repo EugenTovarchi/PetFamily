@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
-namespace PetFamily.Domain.Pets;
+namespace PetFamily.Domain.PetManagment.ValueObjects;
 
 public enum PetColor
 {

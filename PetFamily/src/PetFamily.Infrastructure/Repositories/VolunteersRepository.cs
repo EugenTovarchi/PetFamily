@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Volunteers;
-using PetFamily.Domain.Volunteers;
+using PetFamily.Domain.PetManagment.AggregateRoot;
 using Shared;
 
 namespace PetFamily.Infrastructure.Repositories;

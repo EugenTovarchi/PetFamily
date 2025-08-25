@@ -1,7 +1,7 @@
 using Shared;
 using System.Collections.ObjectModel;
 
-namespace PetFamily.Domain.Pets.Species;
+namespace PetFamily.Domain.PetManagment.Entities;
 
 /// <summary>
 /// Вид питомца

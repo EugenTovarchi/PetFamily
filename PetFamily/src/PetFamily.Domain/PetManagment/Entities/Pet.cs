@@ -1,8 +1,8 @@
-using PetFamily.Domain.Requsites;
+using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
 
-namespace PetFamily.Domain.Pets;
+namespace PetFamily.Domain.PetManagment.Entities;
 
 public class Pet : Entity<PetId>
 {

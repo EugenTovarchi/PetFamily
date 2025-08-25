@@ -1,4 +1,5 @@
 using Shared;
+using Shared.Constants;
 
 namespace PetFamily.Domain.Shared;
 
@@ -17,17 +18,28 @@ public record FullName
 
     public static Result<FullName> Create(string firstName, string lastName)
     {
-        if (string.IsNullOrWhiteSpace(firstName))
+        if (string.IsNullOrWhiteSpace(firstName) && firstName.Length < Constants.MAX_NAMES_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("firstName");
 
-        if (string.IsNullOrWhiteSpace(lastName))
+        if (string.IsNullOrWhiteSpace(lastName) && lastName.Length < Constants.MAX_NAMES_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("lastName");
 
         return new FullName(firstName, lastName);
     }
 
-    public static FullName CreateWithMiddle(string firstName, string lastName, string middleName)
-        => new(firstName, lastName, middleName);
+    public static Result<FullName> CreateWithMiddle(string firstName, string lastName, string middleName)
+    {
+        if (string.IsNullOrWhiteSpace(firstName) && firstName.Length < Constants.MAX_NAMES_LENGTH)
+            return Errors.General.ValueIsEmptyOrWhiteSpace("firstName");
+
+        if (string.IsNullOrWhiteSpace(lastName) && lastName.Length < Constants.MAX_NAMES_LENGTH)
+            return Errors.General.ValueIsEmptyOrWhiteSpace("lastName");
+
+        if (string.IsNullOrWhiteSpace(middleName) && middleName.Length < Constants.MAX_NAMES_LENGTH)
+            return Errors.General.ValueIsEmptyOrWhiteSpace("middleName");
+
+        return new FullName(firstName, lastName, middleName);
+    }
 
     public string GetFullName => MiddleName == null
         ? $"{FirstName} {LastName}"

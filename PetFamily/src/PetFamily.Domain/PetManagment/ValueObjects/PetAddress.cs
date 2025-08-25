@@ -1,6 +1,6 @@
 using Shared;
 
-namespace PetFamily.Domain.Pets;
+namespace PetFamily.Domain.PetManagment.ValueObjects;
 
 public record PetAddress
 {

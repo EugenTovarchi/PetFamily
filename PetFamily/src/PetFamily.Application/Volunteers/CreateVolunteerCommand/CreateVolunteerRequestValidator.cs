@@ -10,7 +10,7 @@ public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteer
 {
     public CreateVolunteerRequestValidator()
     {
-        RuleFor(c => new { c.FirstName, c.LastName, c.MiddleName })
+        RuleFor(c => c.FullName)
             .MustBeValueObject(c =>
             string.IsNullOrWhiteSpace(c.MiddleName)
             ? FullName.Create(c.FirstName, c.LastName)

@@ -14,18 +14,23 @@ public class CreateVolunteerService
             return Errors.General.ValueIsInvalid("request");
 
         var existVolunteer = await _repository.GetByName(
-            command.Request.FirstName,
-            command.Request.LastName,
-            command.Request.MiddleName,
+            command.Request.FullName.FirstName,
+            command.Request.FullName.LastName,
+            command.Request.FullName.MiddleName,
             cancellationToken);
 
         if (existVolunteer.IsSuccess)
             return Errors.General.Duplicate("existVolunteer");
 
 
-        var fullName = command.Request.MiddleName is null
-        ? FullName.Create(command.Request.FirstName, command.Request.LastName)
-        : FullName.CreateWithMiddle(command.Request.FirstName, command.Request.LastName, command.Request.MiddleName);
+        var fullName = command.Request.FullName.FirstName is null
+        ? FullName.Create(
+        command.Request.FullName.FirstName!,
+        command.Request.FullName.LastName)
+        : FullName.CreateWithMiddle(
+            command.Request.FullName.FirstName,
+            command.Request.FullName.FirstName,
+            command.Request.FullName.FirstName);
 
         var volunteerId = VolunteerId.NewVolunteerId();
 

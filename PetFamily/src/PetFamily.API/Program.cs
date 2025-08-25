@@ -16,6 +16,8 @@ public class Program
             .Enrich.WithEnvironmentName()
             .WriteTo.Console()
             .WriteTo.Debug()
+            .WriteTo.Seq(builder.Configuration.GetConnectionString("Seq")
+                        ?? throw new ArgumentNullException("Seq"))
             .WriteTo.File(path: Path.Combine("logs", "log-.txt"),
                         rollingInterval: RollingInterval.Day, //создается каждый день новый файл
                         retainedFileCountLimit: 7, // хранить логи за 7 дней, с 8го начнут заменяться

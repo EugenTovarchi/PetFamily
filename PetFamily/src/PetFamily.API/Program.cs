@@ -1,11 +1,12 @@
 using Microsoft.OpenApi.Models;
 using PetFamily.Infrastructure;
+using System.Threading.Tasks;
 
 namespace PetFamily.API;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,8 @@ public class Program
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "PetFamily v1");
             });
+
+            await app.ApplyMigrations();
         }
 
         app.UseHttpsRedirection();

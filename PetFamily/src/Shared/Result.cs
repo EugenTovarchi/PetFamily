@@ -6,9 +6,9 @@ public class Result
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
 
-    protected Result(bool isSuccess, Error error)
+    protected Result(bool isSuccess, Error error) 
     {
-        if (isSuccess && error is not null)
+        if (isSuccess &&  error is not null)   
             throw new InvalidOperationException("Successful result cannot contain error");
 
         if (!isSuccess && error is null)

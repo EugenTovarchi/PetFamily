@@ -1,6 +1,6 @@
 using Shared;
 
-namespace PetFamily.Domain.Requsites;
+namespace PetFamily.Domain.PetManagment.ValueObjects;
 
 public sealed record Requisites(
     string Title,

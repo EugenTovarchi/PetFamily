@@ -1,9 +1,9 @@
-using PetFamily.Domain.Pets;
-using PetFamily.Domain.Requsites;
+using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
 
-namespace PetFamily.Domain.Volunteers;
+namespace PetFamily.Domain.PetManagment.AggregateRoot;
 
 public class Volunteer : Entity<VolunteerId>
 {

@@ -1,6 +1,6 @@
 using Shared;
 
-namespace PetFamily.Domain.Volunteers;
+namespace PetFamily.Domain.PetManagment.ValueObjects;
 
 public  record VolunteerSocialMedia(string Title, string Url)
 {

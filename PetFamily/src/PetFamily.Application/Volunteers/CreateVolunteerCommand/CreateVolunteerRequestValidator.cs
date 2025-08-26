@@ -3,6 +3,8 @@ using PetFamily.Application.Validation;
 using PetFamily.Contracts.Requests;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
+using Shared;
+using System.Reflection.Metadata;
 
 namespace PetFamily.Application.Volunteers.CreateVolunteer;
 
@@ -11,21 +13,20 @@ public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteer
     public CreateVolunteerRequestValidator()
     {
         RuleFor(c => c.FullName)
-            .MustBeValueObject(c =>
-            string.IsNullOrWhiteSpace(c.MiddleName)
-            ? FullName.Create(c.FirstName, c.LastName)
-            : FullName.CreateWithMiddle(c.FirstName, c.LastName, c.MiddleName));
+        .MustBeValueObject(fullNameRequest =>
+        string.IsNullOrWhiteSpace(fullNameRequest.MiddleName)
+            ? FullName.Create(fullNameRequest.FirstName, fullNameRequest.LastName)
+            : FullName.CreateWithMiddle(fullNameRequest.FirstName, fullNameRequest.LastName, fullNameRequest.MiddleName));
 
         RuleFor(c => c.Phone).MustBeValueObject(Phone.Create);
         RuleFor(c => c.Email).MustBeValueObject(Email.Create);
 
         RuleFor(c => c.VolunteerInfo)
-         .NotEmpty().WithError("value.is.invalid", "Volunteer info cannot be empty!")
-         .MaximumLength(1000).WithError("value.is.invalid", "Volunteer info has to be less than 1000 symbols!");
+         .NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("VolunteerInfo"))
+         .MaximumLength(1000).WithError(Errors.Validation.RecordIsInvalid("VolunteerInfo"));
 
         RuleFor(c => c.ExperienceYears)
-         .NotEmpty().WithError("value.is.invalid", "ExperienceYears  cannot be empty!")
-         .GreaterThanOrEqualTo(0).WithError("value.is.invalid", "Experience years has to be possitive");
+         .GreaterThanOrEqualTo(0).WithError(Errors.General.ValueMustBePositive("ExperienceYears"));
 
         RuleForEach(c => c.VolunteerSocialMediaDtos).MustBeValueObject(dto => VolunteerSocialMedia.Create(dto.Title, dto.Url))
            .When(c => c.VolunteerSocialMediaDtos != null);

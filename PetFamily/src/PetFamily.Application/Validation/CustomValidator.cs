@@ -20,11 +20,8 @@ public static class CustomValidator
     }
 
     public static IRuleBuilderOptions<T, TProperty> WithError<T, TProperty>(
-     this IRuleBuilderOptions<T,TProperty> rule,
-     string errorCode,
-     string errorMessage)
+     this IRuleBuilderOptions<T,TProperty> rule,Error error)
     {
-        var error = Error.Validation(errorCode, errorMessage);
         return rule.WithMessage(error.Serialize());
     }
 }

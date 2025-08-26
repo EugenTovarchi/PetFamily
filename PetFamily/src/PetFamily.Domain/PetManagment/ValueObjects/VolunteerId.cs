@@ -16,4 +16,9 @@ public record VolunteerId
         ArgumentNullException.ThrowIfNull(volunteerId);
         return volunteerId.Value;
     }
+
+    public static implicit operator VolunteerId(Guid id)
+    {
+        return new VolunteerId(id);
+    }
 }

@@ -10,7 +10,7 @@ public class UpdateMainInfoValidator : AbstractValidator<UpdateMainInfoRequest>
 {
     public UpdateMainInfoValidator()
     {
-        RuleFor(u => u.Id).MustBeValueObject(VolunteerId.Create);
+        //RuleFor(u => u.Id).MustBeValueObject(VolunteerId.Create);
 
         RuleFor(u => u.FullName)
         .MustBeValueObject(fullNameRequest =>

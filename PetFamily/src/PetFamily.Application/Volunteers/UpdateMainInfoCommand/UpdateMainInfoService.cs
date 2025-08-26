@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using PetFamily.Contracts.Requests;
 using PetFamily.Domain.PetManagment.AggregateRoot;
 using PetFamily.Domain.Shared;
 using Shared;
@@ -47,7 +46,7 @@ public class UpdateMainInfoService
             command.Request.FullName.FirstName,
             command.Request.FullName.FirstName);
 
-        var volunteerId = VolunteerId.NewVolunteerId();
+        var volunteerId = command.Request.Id;
 
         var phone = Phone.Create(command.Request.Phone).Value;
 
@@ -72,7 +71,7 @@ public class UpdateMainInfoService
         );
 
         await _repository.Add(volunteer, cancellationToken);
-        _logger.LogInformation("Волонтёр с {volunteerId} создан", volunteerId);
+        _logger.LogInformation("Данные волонтёра с {volunteerId} обновлены ", volunteerId);
 
         return volunteer.Id.Value;
     }

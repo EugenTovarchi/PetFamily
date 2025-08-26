@@ -1,7 +1,9 @@
+using Microsoft.VisualBasic;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
+using Constants = Shared.Constants.Constants;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
 
@@ -55,6 +57,21 @@ public class Volunteer : Entity<VolunteerId>
     public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
     public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
 
+    public Result UpdateInfo(string newVolunteernfo)
+    {
+        if(string.IsNullOrEmpty(newVolunteernfo) && newVolunteernfo.Length > Constants.MAX_INFO_LENGTH)
+            return Errors.General.ValueIsEmptyOrWhiteSpace("newVolunteernfo");
+
+        return Result.Success();
+    }
+
+    public Result UpdateExperienceYears(decimal updatedExperienceYears)
+    {
+        if(updatedExperienceYears < 0)
+            return Errors.General.ValueMustBePositive("newVolunteernfo");
+
+        return Result.Success();
+    }
     public Result AddPet(Pet pet)
     {
         if (pet == null)

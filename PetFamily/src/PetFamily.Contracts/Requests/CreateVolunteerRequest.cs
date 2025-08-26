@@ -1,5 +1,4 @@
 using PetFamily.Contracts.Dtos;
-using PetFamily.Domain.Shared;
 
 namespace PetFamily.Contracts.Requests;
 

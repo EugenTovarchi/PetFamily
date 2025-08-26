@@ -1,17 +1,18 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
 using PetFamily.Contracts.Requests;
-using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
 
-namespace PetFamily.Application.Volunteers.CreateVolunteer;
+namespace PetFamily.Application.Volunteers.UpdateMainInfoCommand;
 
-public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteerRequest>
+public class UpdateMainInfoValidator : AbstractValidator<UpdateMainInfoRequest>
 {
-    public CreateVolunteerRequestValidator()
+    public UpdateMainInfoValidator()
     {
-        RuleFor(c => c.FullName)
+        RuleFor(u => u.Id).MustBeValueObject(VolunteerId.Create);
+
+        RuleFor(u => u.FullName)
         .MustBeValueObject(fullNameRequest =>
         string.IsNullOrWhiteSpace(fullNameRequest.MiddleName)
             ? FullName.Create(fullNameRequest.FirstName, fullNameRequest.LastName)
@@ -26,11 +27,5 @@ public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteer
 
         RuleFor(c => c.ExperienceYears)
          .GreaterThanOrEqualTo(0).WithError(Errors.General.ValueMustBePositive("ExperienceYears"));
-
-        RuleForEach(c => c.VolunteerSocialMediaDtos).MustBeValueObject(dto => VolunteerSocialMedia.Create(dto.Title, dto.Url))
-           .When(c => c.VolunteerSocialMediaDtos != null);
-
-        //попробовал разные варианты
-        RuleForEach(c => c.RequisitesDtos).Must(dto => dto.Validate().IsSuccess);
     }
 }

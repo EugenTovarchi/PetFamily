@@ -1,3 +1,5 @@
+using Shared;
+
 public record VolunteerId
 {
     private VolunteerId(Guid value) => Value = value;

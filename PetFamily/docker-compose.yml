@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgresUser"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,16 +21,37 @@ services:
   api:
     image: ${DOCKER_REGISTRY-}petfamilyapi
     build:
-      context: .
-      dockerfile: src/PetFamily.API/Dockerfile
+        context: .
+        dockerfile: src/PetFamily.API/Dockerfile
     ports:
-      - "8080:80"
+    - "8080:80"
     depends_on:
-      db:
-        condition: service_healthy
+     db:
+      condition: service_healthy
+     seq:
+      condition: service_started
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=PetFamily;Username=postgres;Password=yourStrongPassword123
+    - ASPNETCORE_ENVIRONMENT=Development
+    - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=PetFamily;Username=postgresUser;Password=postgresPassword
+    - Serilog__WriteTo__0__Name=Seq
+    - Serilog__WriteTo__0__Args__serverUrl=http://seq:5341
+    restart: unless-stopped 
+
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    restart: unless-stopped 
+    environment: 
+    - ACCEPT_EULA=Y
+    - SEQ_FIRSTRUN_ADMINPASSWORD=admin123
+    ports:
+    - 5341:5341
+    - 8081:80  
+    volumes:
+    - seq_data:/data
+
+  
 
 volumes:
   postgres_data:
+  seq_data:  

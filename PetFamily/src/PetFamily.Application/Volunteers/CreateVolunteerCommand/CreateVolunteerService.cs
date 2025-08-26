@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using PetFamily.Domain.PetManagment.AggregateRoot;
 using PetFamily.Domain.Shared;
 using Shared;
@@ -7,8 +8,15 @@ namespace PetFamily.Application.Volunteers.CreateVolunteer;
 public class CreateVolunteerService
 {
     private readonly IVolunteersRepository _repository;
-    public CreateVolunteerService(IVolunteersRepository repository) => _repository = repository;
-    public async Task <Result<Guid>> Handle(CreateVolunteerCommand command, CancellationToken cancellationToken = default)
+    private readonly ILogger<CreateVolunteerService> _logger;
+    public CreateVolunteerService(IVolunteersRepository repository,
+        ILogger<CreateVolunteerService> logger)
+    {
+        _repository = repository;
+        _logger = logger;
+    }
+
+    public async Task<Result<Guid>> Handle(CreateVolunteerCommand command, CancellationToken cancellationToken = default)
     {
         if (command is null)
             return Errors.General.ValueIsInvalid("request");
@@ -20,7 +28,13 @@ public class CreateVolunteerService
             cancellationToken);
 
         if (existVolunteer.IsSuccess)
+        {
+            _logger.LogWarning("Волонтёр: {FirstName} {LastName} уже существует!",
+                command.Request.FullName.FirstName,
+                command.Request.FullName.LastName);
+
             return Errors.General.Duplicate("existVolunteer");
+        }
 
 
         var fullName = command.Request.FullName.FirstName is null
@@ -35,7 +49,7 @@ public class CreateVolunteerService
         var volunteerId = VolunteerId.NewVolunteerId();
 
         var phone = Phone.Create(command.Request.Phone).Value;
-        
+
         var email = Email.Create(command.Request.Email).Value;
 
         //Не стал добавлять т.к. это не обязательные вещи при создании Волонтера( у него может не быть сразу реквизитов или соц сетей)
@@ -57,6 +71,8 @@ public class CreateVolunteerService
         );
 
         await _repository.Add(volunteer, cancellationToken);
+        _logger.LogInformation("Волонтёр с {volunteerId} создан", volunteerId);
+
         return volunteer.Id.Value;
     }
 }

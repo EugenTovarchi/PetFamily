@@ -13,10 +13,10 @@ public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteer
     public CreateVolunteerRequestValidator()
     {
         RuleFor(c => c.FullName)
-            .MustBeValueObject(c =>
-            string.IsNullOrWhiteSpace(c.MiddleName)
-            ? FullName.Create(c.FirstName, c.LastName)
-            : FullName.CreateWithMiddle(c.FirstName, c.LastName, c.MiddleName));
+        .MustBeValueObject(fullNameRequest =>
+        string.IsNullOrWhiteSpace(fullNameRequest.MiddleName)
+            ? FullName.Create(fullNameRequest.FirstName, fullNameRequest.LastName)
+            : FullName.CreateWithMiddle(fullNameRequest.FirstName, fullNameRequest.LastName, fullNameRequest.MiddleName));
 
         RuleFor(c => c.Phone).MustBeValueObject(Phone.Create);
         RuleFor(c => c.Email).MustBeValueObject(Email.Create);
@@ -26,7 +26,6 @@ public class CreateVolunteerRequestValidator : AbstractValidator<CreateVolunteer
          .MaximumLength(1000).WithError(Errors.Validation.RecordIsInvalid("VolunteerInfo"));
 
         RuleFor(c => c.ExperienceYears)
-         .NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("ExperienceYears"))
          .GreaterThanOrEqualTo(0).WithError(Errors.General.ValueMustBePositive("ExperienceYears"));
 
         RuleForEach(c => c.VolunteerSocialMediaDtos).MustBeValueObject(dto => VolunteerSocialMedia.Create(dto.Title, dto.Url))

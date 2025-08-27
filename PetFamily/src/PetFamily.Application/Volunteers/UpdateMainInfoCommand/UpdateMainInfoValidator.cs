@@ -1,18 +1,24 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
+using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Requests;
 using PetFamily.Domain.Shared;
 using Shared;
 
 namespace PetFamily.Application.Volunteers.UpdateMainInfoCommand;
 
-public class UpdateMainInfoValidator : AbstractValidator<UpdateMainInfoRequest>
+public class UpdateMainInfoRequestValidator : AbstractValidator<UpdateMainInfoRequest>
 {
-    public UpdateMainInfoValidator()
+    public UpdateMainInfoRequestValidator()
     {
-        //RuleFor(u => u.Id).MustBeValueObject(VolunteerId.Create);
-
-        RuleFor(u => u.FullName)
+        RuleFor(u => u.Id).NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("VolunteerId"));
+    }
+}
+public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoDto>
+{
+    public UpdateMainInfoDtoValidator()
+    {
+        RuleFor(c => c.FullName)
         .MustBeValueObject(fullNameRequest =>
         string.IsNullOrWhiteSpace(fullNameRequest.MiddleName)
             ? FullName.Create(fullNameRequest.FirstName, fullNameRequest.LastName)

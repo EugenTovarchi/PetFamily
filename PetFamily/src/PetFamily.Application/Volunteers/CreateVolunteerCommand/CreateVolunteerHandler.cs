@@ -3,20 +3,20 @@ using PetFamily.Domain.PetManagment.AggregateRoot;
 using PetFamily.Domain.Shared;
 using Shared;
 
-namespace PetFamily.Application.Volunteers.UpdateMainInfoCommand;
+namespace PetFamily.Application.Volunteers.CreateVolunteer;
 
-public class UpdateMainInfoService
+public class CreateVolunteerHandler
 {
     private readonly IVolunteersRepository _repository;
-    private readonly ILogger<UpdateMainInfoService> _logger;
-    public UpdateMainInfoService(IVolunteersRepository repository,
-        ILogger<UpdateMainInfoService> logger)
+    private readonly ILogger<CreateVolunteerHandler> _logger;
+    public CreateVolunteerHandler(IVolunteersRepository repository,
+        ILogger<CreateVolunteerHandler> logger)
     {
         _repository = repository;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(UpdateMainInfoCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid>> Handle(CreateVolunteerCommand command, CancellationToken cancellationToken = default)
     {
         if (command is null)
             return Errors.General.ValueIsInvalid("request");
@@ -27,26 +27,26 @@ public class UpdateMainInfoService
             command.Request.FullName.MiddleName,
             cancellationToken);
 
-        if (!existVolunteer.IsSuccess)
+        if (existVolunteer.IsSuccess)
         {
-            _logger.LogWarning("Волонтёр: {FirstName} {LastName} не существует!",
+            _logger.LogWarning("Волонтёр: {FirstName} {LastName} уже существует!",
                 command.Request.FullName.FirstName,
                 command.Request.FullName.LastName);
 
-            return Errors.Volunteer.NotFound("existVolunteer");
+            return Errors.General.Duplicate("existVolunteer");
         }
 
 
-        var fullName = command.Request.FullName.FirstName is null
+        var fullName = command.Request.FullName.MiddleName is null
         ? FullName.Create(
         command.Request.FullName.FirstName!,
         command.Request.FullName.LastName)
         : FullName.CreateWithMiddle(
             command.Request.FullName.FirstName,
-            command.Request.FullName.FirstName,
-            command.Request.FullName.FirstName);
+            command.Request.FullName.LastName,
+            command.Request.FullName.MiddleName);
 
-        var volunteerId = command.Request.Id;
+        var volunteerId = VolunteerId.NewVolunteerId();
 
         var phone = Phone.Create(command.Request.Phone).Value;
 
@@ -71,7 +71,7 @@ public class UpdateMainInfoService
         );
 
         await _repository.Add(volunteer, cancellationToken);
-        _logger.LogInformation("Данные волонтёра с {volunteerId} обновлены ", volunteerId);
+        _logger.LogInformation("Волонтёр с {volunteerId} создан", volunteerId);
 
         return volunteer.Id.Value;
     }

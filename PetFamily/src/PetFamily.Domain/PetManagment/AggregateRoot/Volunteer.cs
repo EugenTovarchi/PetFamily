@@ -7,7 +7,7 @@ using Constants = Shared.Constants.Constants;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
 
-public class Volunteer : Entity<VolunteerId>
+public class Volunteer : Entity<VolunteerId>, ISoftDeletable
 {
     private Volunteer(VolunteerId id) : base(id) { }
 
@@ -27,6 +27,8 @@ public class Volunteer : Entity<VolunteerId>
         VolunteerInfo = volunteerInfo ?? string.Empty;
         ExperienceYears = experienceYears;
     }
+
+    private bool _isDeleted = false;
 
     public FullName VolunteerFullName { get; private set; } = null!;
 
@@ -62,13 +64,17 @@ public class Volunteer : Entity<VolunteerId>
         if(string.IsNullOrEmpty(newVolunteernfo) && newVolunteernfo.Length > Constants.MAX_INFO_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("newVolunteernfo");
 
+        VolunteerInfo= newVolunteernfo;
+
         return Result.Success();
     }
 
-    public Result UpdateExperienceYears(decimal updatedExperienceYears)
+    public Result UpdateExperienceYears(decimal newExperienceYears)
     {
-        if(updatedExperienceYears < 0)
+        if(newExperienceYears < 0)
             return Errors.General.ValueMustBePositive("newVolunteernfo");
+
+        ExperienceYears = newExperienceYears;
 
         return Result.Success();
     }
@@ -169,5 +175,29 @@ public class Volunteer : Entity<VolunteerId>
             return 0;
 
         return _pets.Count(p => p.PetStatus == status);
+    }
+
+    public void UpdateMainInfo(
+        FullName volunteerFullName,
+        Email email,
+        Phone phone,
+        string volunteerInfo,
+        decimal experienceYears)
+    {
+        VolunteerFullName = volunteerFullName;
+        Email = email;
+        Phone = phone;
+        VolunteerInfo = volunteerInfo;
+        ExperienceYears = experienceYears;
+    }
+
+    public void Delete()
+    {
+        _isDeleted = true;
+    }
+
+    public void Restore()
+    {
+        _isDeleted = false;
     }
 }

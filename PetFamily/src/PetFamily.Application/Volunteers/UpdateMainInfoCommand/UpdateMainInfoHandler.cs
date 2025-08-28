@@ -52,15 +52,6 @@ public class UpdateMainInfoHandler
 
         var experienceYears = request.Dto.ExperienceYears;
 
-
-        //Не стал добавлять т.к. это не обязательные вещи при создании Волонтера( у него может не быть сразу реквизитов или соц сетей)
-
-        //var socialMedias = command.Request.VolunteerSocialMediaDtos
-        //    .Select(sm => VolunteerSocialMedia.Create(sm.Title, sm.Url)).ToList();
-
-        //var requisites = command.Request.RequisitesDtos
-        //    .Select(sm => Requisites.Create(sm.Title, sm.Instruction, sm.Value)).ToList();
-
         volunteer.Value.UpdateMainInfo(
             fullName.Value,
             email,

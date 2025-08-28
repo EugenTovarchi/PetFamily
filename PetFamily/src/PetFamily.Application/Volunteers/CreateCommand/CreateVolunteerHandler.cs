@@ -36,7 +36,6 @@ public class CreateVolunteerHandler
             return Errors.General.Duplicate("existVolunteer");
         }
 
-
         var fullName = command.Request.FullName.MiddleName is null
         ? FullName.Create(
         command.Request.FullName.FirstName!,
@@ -51,14 +50,6 @@ public class CreateVolunteerHandler
         var phone = Phone.Create(command.Request.Phone).Value;
 
         var email = Email.Create(command.Request.Email).Value;
-
-        //Не стал добавлять т.к. это не обязательные вещи при создании Волонтера( у него может не быть сразу реквизитов или соц сетей)
-
-        //var socialMedias = command.Request.VolunteerSocialMediaDtos
-        //    .Select(sm => VolunteerSocialMedia.Create(sm.Title, sm.Url)).ToList();
-
-        //var requisites = command.Request.RequisitesDtos
-        //    .Select(sm => Requisites.Create(sm.Title, sm.Instruction, sm.Value)).ToList();
 
         var volunteer = new Volunteer
         (

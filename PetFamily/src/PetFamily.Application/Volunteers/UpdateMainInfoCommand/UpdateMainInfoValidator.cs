@@ -18,6 +18,13 @@ public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoDto>
 {
     public UpdateMainInfoDtoValidator()
     {
+        RuleFor(c => c.VolunteerInfo)
+         .NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("VolunteerInfo"))
+         .MaximumLength(1000).WithError(Errors.Validation.RecordIsInvalid("VolunteerInfo"));
+
+        RuleFor(c => c.ExperienceYears)
+         .GreaterThanOrEqualTo(1).WithError(Errors.General.ValueMustBePositive("ExperienceYears"));
+
         RuleFor(c => c.FullName)
         .MustBeValueObject(fullNameRequest =>
         string.IsNullOrWhiteSpace(fullNameRequest.MiddleName)
@@ -26,12 +33,5 @@ public class UpdateMainInfoDtoValidator : AbstractValidator<UpdateMainInfoDto>
 
         RuleFor(c => c.Phone).MustBeValueObject(Phone.Create);
         RuleFor(c => c.Email).MustBeValueObject(Email.Create);
-
-        RuleFor(c => c.VolunteerInfo)
-         .NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("VolunteerInfo"))
-         .MaximumLength(1000).WithError(Errors.Validation.RecordIsInvalid("VolunteerInfo"));
-
-        RuleFor(c => c.ExperienceYears)
-         .GreaterThanOrEqualTo(0).WithError(Errors.General.ValueMustBePositive("ExperienceYears"));
     }
 }

@@ -2,6 +2,7 @@ using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
+using System.Collections.Generic;
 using Constants = Shared.Constants.Constants;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
@@ -41,17 +42,17 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
 
     private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
 
-    public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
+    public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias.ToList();
 
 
     private readonly List<Requisites> _volunteerRequisites = [];
 
-    public IReadOnlyCollection<Requisites> Requisites => _volunteerRequisites.AsReadOnly();
+    public IReadOnlyCollection<Requisites> Requisites => _volunteerRequisites.ToList();
 
 
     private readonly List<Pet> _pets = [];
 
-    public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();
+    public IReadOnlyCollection<Pet> Pets => _pets.ToList();
 
 
     public int LookingTreatmentPets => CountPetsByStatus(PetStatus.LookingTreatment);
@@ -60,7 +61,7 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
 
     public Result UpdateInfo(string newVolunteernfo)
     {
-        if(string.IsNullOrEmpty(newVolunteernfo) && newVolunteernfo.Length > Constants.MAX_INFO_LENGTH)
+        if(string.IsNullOrEmpty(newVolunteernfo) || newVolunteernfo.Length > Constants.MAX_INFO_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("newVolunteernfo");
 
         VolunteerInfo= newVolunteernfo;
@@ -135,13 +136,15 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         return Result.Success();
     }
 
-    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
+    public Result UpdateRequisites(IEnumerable<Requisites> requisites)
     {
-        var removeResult = RemoveRequisites(oldRequisite);
-        if (removeResult.IsFailure)
-            return removeResult;
+        if (requisites is null)
+            return Errors.General.ValueIsInvalid("requisites");
 
-        return AddRequisites(newRequisite);
+        _volunteerRequisites.Clear();
+
+        _volunteerRequisites.AddRange(requisites);
+        return Result.Success();
     }
 
 
@@ -188,6 +191,17 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         Phone = phone;
         VolunteerInfo = volunteerInfo;
         ExperienceYears = experienceYears;
+    }
+
+    public Result UpdateSocialMedias(IEnumerable<VolunteerSocialMedia> socialMedias)
+    {
+        if (socialMedias is null)
+            return Errors.General.ValueIsInvalid("socialMedias");
+        
+        _volunteerSocialMedias.Clear();
+
+        _volunteerSocialMedias.AddRange(socialMedias);
+        return Result.Success();
     }
 
     public void Delete()

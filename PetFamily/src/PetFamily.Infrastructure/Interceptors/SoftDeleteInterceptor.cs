@@ -4,16 +4,16 @@ using PetFamily.Domain.Shared;
 
 namespace PetFamily.Infrastructure.Interceptors;
 
-public class SoftDeleteInterceptor: SaveChangesInterceptor
+public class SoftDeleteInterceptor : SaveChangesInterceptor
 {
-    public override async ValueTask<int> SavedChangesAsync(
-        SaveChangesCompletedEventData eventData,
-        int result,
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
+        DbContextEventData eventData,
+        InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        if(eventData.Context is null)
+        if (eventData.Context is null)
         {
-            return await base.SavedChangesAsync(eventData, result, cancellationToken);  
+            return await base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
         var entries = eventData.Context.ChangeTracker
@@ -26,6 +26,6 @@ public class SoftDeleteInterceptor: SaveChangesInterceptor
             entry.Entity.Delete();
         }
 
-        return await base.SavedChangesAsync(eventData, result, cancellationToken);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }

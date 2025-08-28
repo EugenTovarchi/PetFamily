@@ -109,11 +109,13 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
     public void Delete()
     {
-        _isDeleted = true;
+        if (_isDeleted)
+            return;
     }
 
     public void Restore()
     {
-        _isDeleted = false;
+        if (!_isDeleted)
+            return;
     }
 }

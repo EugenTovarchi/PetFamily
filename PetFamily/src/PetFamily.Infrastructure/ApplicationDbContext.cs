@@ -17,7 +17,7 @@ public class ApplicationDbContext(IConfiguration configuration) : DbContext
         optionsBuilder.UseNpgsql(_configuration.GetConnectionString("DefaultConnection"));
         optionsBuilder.UseLoggerFactory(CreateLoggerFactory());
 
-        optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
+        //optionsBuilder.AddInterceptors(new SoftDeleteInterceptor());
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

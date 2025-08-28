@@ -1,4 +1,3 @@
-using Microsoft.VisualBasic;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
@@ -193,11 +192,21 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
 
     public void Delete()
     {
+        if (_isDeleted)
+            return;
+
         _isDeleted = true;
+        foreach(var pet in _pets)
+            pet.Delete();
     }
 
     public void Restore()
     {
+        if (!_isDeleted)
+            return;
+
         _isDeleted = false;
+        foreach (var pet in _pets)
+            pet.Restore();
     }
 }

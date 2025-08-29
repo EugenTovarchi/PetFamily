@@ -36,9 +36,6 @@ public class UpdateSocialMediasHandler
             .Select(sm => VolunteerSocialMedia.Create(sm.Title, sm.Url).Value)
             .ToList();
 
-        //var requisites = command.Request.RequisitesDtos
-        //    .Select(sm => Requisites.Create(sm.Title, sm.Instruction, sm.Value)).ToList();
-
         volunteer.Value.UpdateSocialMedias(socialMedias);
 
         await _repository.Save(volunteer.Value, cancellationToken);

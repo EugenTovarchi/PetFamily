@@ -1,7 +1,7 @@
 namespace PetFamily.Contracts.Dtos;
 
 public record UpdateMainInfoDto(
-FullNameRequest FullName,
+FullNameDto FullName,
 string Phone,
 string Email,
 string VolunteerInfo,

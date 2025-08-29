@@ -1,6 +1,5 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Application;
 using PetFamily.Application.Volunteers.CreateVolunteer;
 using PetFamily.Application.Volunteers.DeleteCommand;
 using PetFamily.Application.Volunteers.UpdateMainInfoCommand;
@@ -35,8 +34,7 @@ public class VolunteersController : ApplicationController
             return validationResult.ToValidationErrorResponse();
         }
 
-        var command = new CreateVolunteerCommand(request);
-        var result = await handler.Handle(command, cancellationToken);
+        var result = await handler.Handle(request, cancellationToken);
 
         if (result.IsFailure)
             return result.Error.ToResponse();

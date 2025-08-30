@@ -20,18 +20,18 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer.Id;
     }
 
-    public async Task<Guid> Delete(Guid volunteerId, CancellationToken cancellationToken = default)
+    public async Task<Guid> Delete(Volunteer volunteer, CancellationToken cancellationToken = default)
     {
-        _dbContext.Remove(volunteerId);
-        await _dbContext.SaveChangesAsync();
-        return volunteerId;
+        _dbContext.Volunteers.Remove(volunteer);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return volunteer.Id;
     }
 
     public async Task<Result<Volunteer>> GetById(Guid volunteerId, CancellationToken cancellationToken)
     {
         var volunteer = await _dbContext.Volunteers
             .Include(v=>v.Pets)
-            .FirstOrDefaultAsync(v=>v.Id==volunteerId,cancellationToken);
+            .FirstOrDefaultAsync(v=>v.Id == volunteerId, cancellationToken);
 
         if (volunteer is null)
             return Errors.General.ValueIsInvalid("volunteer");
@@ -55,8 +55,10 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer;
     }
 
-    public Task<Guid> Update(Volunteer volunteer, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Save(Volunteer volunteer, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return volunteer.Id.Value;
     }
 }

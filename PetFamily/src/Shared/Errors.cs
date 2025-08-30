@@ -58,6 +58,10 @@ public static class Errors
         {
             return Error.Validation("entity.not.created", $"{field} has problem.");
         }
+        public static Error NotFound(string? field = null)
+        {
+            return Error.NotFound("value.not.found", $"velue not found {field}");
+        }
     }
 
     public static class Validation

@@ -2,10 +2,12 @@ using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
+using System.Collections.Generic;
+using Constants = Shared.Constants.Constants;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
 
-public class Volunteer : Entity<VolunteerId>
+public class Volunteer : Entity<VolunteerId>, ISoftDeletable
 {
     private Volunteer(VolunteerId id) : base(id) { }
 
@@ -26,6 +28,8 @@ public class Volunteer : Entity<VolunteerId>
         ExperienceYears = experienceYears;
     }
 
+    private bool _isDeleted = false;
+
     public FullName VolunteerFullName { get; private set; } = null!;
 
     public Email Email { get; set; } = null!;
@@ -38,23 +42,42 @@ public class Volunteer : Entity<VolunteerId>
 
     private readonly List<VolunteerSocialMedia> _volunteerSocialMedias = [];
 
-    public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias;
+    public IReadOnlyCollection<VolunteerSocialMedia> VolunteerSocialMedias => _volunteerSocialMedias.ToList();
 
 
     private readonly List<Requisites> _volunteerRequisites = [];
 
-    public IReadOnlyCollection<Requisites> Requisites => _volunteerRequisites.AsReadOnly();
+    public IReadOnlyCollection<Requisites> Requisites => _volunteerRequisites.ToList();
 
 
     private readonly List<Pet> _pets = [];
 
-    public IReadOnlyCollection<Pet> Pets => _pets.AsReadOnly();
+    public IReadOnlyCollection<Pet> Pets => _pets.ToList();
 
 
     public int LookingTreatmentPets => CountPetsByStatus(PetStatus.LookingTreatment);
     public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
     public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
 
+    public Result UpdateInfo(string newVolunteernfo)
+    {
+        if(string.IsNullOrEmpty(newVolunteernfo) || newVolunteernfo.Length > Constants.MAX_INFO_LENGTH)
+            return Errors.General.ValueIsEmptyOrWhiteSpace("newVolunteernfo");
+
+        VolunteerInfo= newVolunteernfo;
+
+        return Result.Success();
+    }
+
+    public Result UpdateExperienceYears(decimal newExperienceYears)
+    {
+        if(newExperienceYears < 0)
+            return Errors.General.ValueMustBePositive("newVolunteernfo");
+
+        ExperienceYears = newExperienceYears;
+
+        return Result.Success();
+    }
     public Result AddPet(Pet pet)
     {
         if (pet == null)
@@ -113,13 +136,15 @@ public class Volunteer : Entity<VolunteerId>
         return Result.Success();
     }
 
-    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
+    public Result UpdateRequisites(IEnumerable<Requisites> requisites)
     {
-        var removeResult = RemoveRequisites(oldRequisite);
-        if (removeResult.IsFailure)
-            return removeResult;
+        if (requisites is null)
+            return Errors.General.ValueIsInvalid("requisites");
 
-        return AddRequisites(newRequisite);
+        _volunteerRequisites.Clear();
+
+        _volunteerRequisites.AddRange(requisites);
+        return Result.Success();
     }
 
 
@@ -152,5 +177,50 @@ public class Volunteer : Entity<VolunteerId>
             return 0;
 
         return _pets.Count(p => p.PetStatus == status);
+    }
+
+    public void UpdateMainInfo(
+        FullName volunteerFullName,
+        Email email,
+        Phone phone,
+        string volunteerInfo,
+        decimal experienceYears)
+    {
+        VolunteerFullName = volunteerFullName;
+        Email = email;
+        Phone = phone;
+        VolunteerInfo = volunteerInfo;
+        ExperienceYears = experienceYears;
+    }
+
+    public Result UpdateSocialMedias(IEnumerable<VolunteerSocialMedia> socialMedias)
+    {
+        if (socialMedias is null)
+            return Errors.General.ValueIsInvalid("socialMedias");
+        
+        _volunteerSocialMedias.Clear();
+
+        _volunteerSocialMedias.AddRange(socialMedias);
+        return Result.Success();
+    }
+
+    public void Delete()
+    {
+        if (_isDeleted)
+            return;
+
+        _isDeleted = true;
+        foreach(var pet in _pets)
+            pet.Delete();
+    }
+
+    public void Restore()
+    {
+        if (!_isDeleted)
+            return;
+
+        _isDeleted = false;
+        foreach (var pet in _pets)
+            pet.Restore();
     }
 }

@@ -4,7 +4,7 @@ using Shared;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
-public class Pet : Entity<PetId>
+public class Pet : Entity<PetId>, ISoftDeletable
 {
     private Pet(PetId id) : base(id) { }
 
@@ -40,6 +40,7 @@ public class Pet : Entity<PetId>
         CreatedAt = DateTime.UtcNow;
     }
 
+    private bool _isDeleted = false;
     public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; } = string.Empty;
@@ -104,5 +105,17 @@ public class Pet : Entity<PetId>
             return removeResult;
 
         return AddRequisites(newRequisite);
+    }
+
+    public void Delete()
+    {
+        if (_isDeleted)
+            return;
+    }
+
+    public void Restore()
+    {
+        if (!_isDeleted)
+            return;
     }
 }

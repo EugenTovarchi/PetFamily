@@ -1,3 +1,5 @@
+using Shared;
+
 public record VolunteerId
 {
     private VolunteerId(Guid value) => Value = value;
@@ -6,7 +8,6 @@ public record VolunteerId
 
     public static VolunteerId NewVolunteerId() => new(Guid.NewGuid());  
     public static VolunteerId EmptyVolunteerId () => new (Guid.Empty);
-
     public static VolunteerId Create(Guid id) => new(id);
 
     public static implicit operator Guid(VolunteerId volunteerId)
@@ -14,4 +15,10 @@ public record VolunteerId
         ArgumentNullException.ThrowIfNull(volunteerId);
         return volunteerId.Value;
     }
+
+    //public static implicit operator VolunteerId(Guid id)
+    //{
+    //    return new VolunteerId(id);
+    //}
 }
+

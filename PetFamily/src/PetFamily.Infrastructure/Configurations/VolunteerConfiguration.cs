@@ -75,5 +75,11 @@ public class VolunteerConfiguration : IEntityTypeConfiguration<Volunteer>
             .HasColumnName("volunteer_exp_years")
            .HasMaxLength(Constants.MAX_MINOR_LENGTH)
            .IsRequired();
+
+        builder.Property<bool>("_isDeleted")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("is_deleted")
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }

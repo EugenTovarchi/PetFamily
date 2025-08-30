@@ -1,10 +1,9 @@
 using PetFamily.Contracts.Dtos;
-using PetFamily.Domain.Shared;
 
 namespace PetFamily.Contracts.Requests;
 
 public record CreateVolunteerRequest(
-    FullNameRequest FullName,
+    FullNameDto FullName,
     string Phone,
     string Email,
     string VolunteerInfo,

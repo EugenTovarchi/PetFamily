@@ -1,4 +1,5 @@
 using Shared;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 
 namespace PetFamily.Domain.PetManagment.Entities;
@@ -10,10 +11,10 @@ public  class Species
 {
     public Guid Id { get; set; }
 
-    public string Title { get; set; } = null!;    //тут точно не null ! 
+    public string Title { get; set; } = null!;    
 
-    private readonly List<Breed> _breeds = new(); //почему класс а не VO со списком ?
-    public ReadOnlyCollection<Breed> Breeds => _breeds.AsReadOnly();
+    private readonly List<Breed> _breeds = []; 
+    public IReadOnlyCollection<Breed> Breeds => _breeds.ToImmutableList();
 
     public Result<Breed> AddBreed(Breed breed)
     {

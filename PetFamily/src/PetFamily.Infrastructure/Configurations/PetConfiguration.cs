@@ -114,5 +114,10 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .HasColumnName("is_deleted")
             .IsRequired()
             .HasDefaultValue(false);
+
+        builder.Property<DateTime?>("DeletionDate")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasColumnName("deletion_date")
+            .IsRequired(false);
     }
 }

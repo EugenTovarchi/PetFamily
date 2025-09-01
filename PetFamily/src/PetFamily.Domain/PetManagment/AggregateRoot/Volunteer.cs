@@ -2,7 +2,7 @@ using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Constants = Shared.Constants.Constants;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
@@ -29,6 +29,10 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
     }
 
     private bool _isDeleted = false;
+    public bool IsDeleted => _isDeleted;
+
+    private DateTime? _deletionDate;
+    public DateTime? DeletionDate => _deletionDate;
 
     public FullName VolunteerFullName { get; private set; } = null!;
 
@@ -53,7 +57,6 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
     private readonly List<Pet> _pets = [];
 
     public IReadOnlyCollection<Pet> Pets => _pets.ToList();
-
 
     public int LookingTreatmentPets => CountPetsByStatus(PetStatus.LookingTreatment);
     public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
@@ -212,6 +215,8 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         _isDeleted = true;
         foreach(var pet in _pets)
             pet.Delete();
+
+        _deletionDate = DateTime.UtcNow;
     }
 
     public void Restore()

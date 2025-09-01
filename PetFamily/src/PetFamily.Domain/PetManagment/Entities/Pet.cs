@@ -1,6 +1,7 @@
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
+using System.Collections.Immutable;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
@@ -41,6 +42,11 @@ public class Pet : Entity<PetId>, ISoftDeletable
     }
 
     private bool _isDeleted = false;
+    public bool IsDeleted => _isDeleted;
+
+    private DateTime? _deletionDate;
+    public DateTime? DeletionDate => _deletionDate;
+
     public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; } = string.Empty;
@@ -72,7 +78,7 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
     private readonly List<Requisites> _petRequisites = [];
 
-    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.AsReadOnly();
+    public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.ToList();
 
     public Result<Requisites> AddRequisites(Requisites requisite)
     {
@@ -109,13 +115,19 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
     public void Delete()
     {
-        if (_isDeleted)
+        if (_isDeleted == true)
             return;
+
+        _isDeleted = true;
+
+        _deletionDate = DateTime.UtcNow;
     }
 
     public void Restore()
     {
         if (!_isDeleted)
             return;
+
+        _isDeleted = false;
     }
 }

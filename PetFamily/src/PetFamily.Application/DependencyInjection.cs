@@ -20,7 +20,7 @@ public static class DependencyInjection
         services.AddScoped<HardDeleteVolunteerHandler>();
         services.AddScoped<UpdateSocialMediasHandler>();
         services.AddScoped<UpdateRequisitesHandler>(); 
-        services.AddScoped<RestoreDeletedVolunteerHandler>(); 
+        services.AddScoped<RestoreDeletedVolunteerHandler>();  
 
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);

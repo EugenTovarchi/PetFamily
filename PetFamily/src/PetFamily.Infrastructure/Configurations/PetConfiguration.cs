@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetManagment.ValueObjects.Ids;
+using PetFamily.Domain.Shared;
 using Shared.Constants;
 
 namespace PetFamily.Infrastructure.Configurations;
@@ -57,8 +59,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
         builder.OwnsOne(v => v.OwnerPhone, ownerPhone =>
         {
             ownerPhone.Property(p => p.Value)
-                .HasColumnName("owner_phone")
-                .IsRequired();
+                .HasColumnName("owner_phone");
         });
 
         builder.Property(p => p.Vaccinated)
@@ -101,7 +102,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
 
         builder.OwnsMany(p => p.PetRequisites, pr =>
         {
-            pr.ToJson("pet_requisites"); 
+            pr.ToJson("pet_requisites");
             pr.Property(x => x.Title)
             .HasMaxLength(Constants.MAX_LOW_LENGTH);
             pr.Property(x => x.Value)
@@ -119,5 +120,21 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .UsePropertyAccessMode(PropertyAccessMode.Field)
             .HasColumnName("deletion_date")
             .IsRequired(false);
+
+
+        builder.OwnsOne(p => p.Photos, pb =>
+        {
+            pb.ToJson("photos");
+            pb.OwnsMany(x=> x.Values, pb =>
+            {
+                pb.Property(p => p.PathToStorage)
+                    .HasConversion(
+                    pts => pts.Path,
+                    value => PhotoPath.Create(value).Value)
+                .IsRequired()
+                .HasMaxLength(Constants.MAX_MINOR_LENGTH);
+            });
+        });
+
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Database;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using Shared;
 
@@ -7,11 +8,15 @@ namespace PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
 public class UpdateSocialMediasHandler
 {
     private readonly IVolunteersRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateSocialMediasHandler> _logger;
-    public UpdateSocialMediasHandler(IVolunteersRepository repository,
+    public UpdateSocialMediasHandler(
+        IVolunteersRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<UpdateSocialMediasHandler> logger)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -38,7 +43,7 @@ public class UpdateSocialMediasHandler
 
         volunteer.Value.UpdateSocialMedias(socialMedias);
 
-        await _repository.Save(volunteer.Value, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Социальные сети волонтёра : {volunteerId} обновлены ", request.Id);
 
         return volunteer.Value.Id.Value;

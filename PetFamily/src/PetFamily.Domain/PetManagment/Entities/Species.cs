@@ -1,6 +1,4 @@
 using Shared;
-using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
@@ -14,7 +12,7 @@ public  class Species
     public string Title { get; set; } = null!;    
 
     private readonly List<Breed> _breeds = []; 
-    public IReadOnlyCollection<Breed> Breeds => _breeds.ToImmutableList();
+    public IReadOnlyCollection<Breed> Breeds => _breeds.ToList();
 
     public Result<Breed> AddBreed(Breed breed)
     {

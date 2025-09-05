@@ -1,5 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using PetFamily.API.Processors;
+using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.CreateVolunteer;
 using PetFamily.Application.Volunteers.DeleteCommand;
 using PetFamily.Application.Volunteers.HardDelete;
@@ -186,6 +188,37 @@ public class VolunteersController : ApplicationController
         }
 
         var result = await handler.Handle(request, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("pet/{id:guid}")]
+    public async Task<ActionResult> AddPet(
+        [FromRoute] Guid id,
+        [FromForm] AddPetRequest request,
+        [FromServices] AddPetHandler handler,
+        CancellationToken cancellationToken)
+    {
+        await using var fileProcessor = new FormFileProcessor();
+        var fileDtos = fileProcessor.Process(request.Files);
+
+        var command = new AddPetCommand(
+            id,
+            request.PetName,
+            request.Description,
+            request.HealthInfo,
+            request.Address, 
+            request.Vaccinated,
+            request.Height,
+            request.Weight,
+            fileDtos,
+            request.Color,
+            request.PetStatus);
+
+        var result = await handler.Handle(command, cancellationToken);
+
         if (result.IsFailure)
             return result.Error.ToResponse();
 

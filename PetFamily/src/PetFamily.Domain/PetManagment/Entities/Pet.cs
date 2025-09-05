@@ -1,7 +1,8 @@
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.ValueObjects;
 using Shared;
-using System.Collections.Immutable;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
@@ -13,32 +14,31 @@ public class Pet : Entity<PetId>, ISoftDeletable
         PetId petId,
         string name,
         string description,
-        PetColor color,
         string healthInfo,
-        PetAddress petAddress,
-        Phone ownerPhone,
+        Address petAddress,
         bool vaccinated,
         double height,
         double weight,
-        PetType petType,
+        //PetType petType,
         DateTime createdAt,
+        ValueObjectList<PetPhoto> photos, 
+        PetColor color ,
         PetStatus petStatus = PetStatus.LookingTreatment,
         IReadOnlyCollection<Requisites>? requisites = null
         ) : base(petId)
     {
         Name = name;
-        Color = color;
-        OwnerPhone = ownerPhone;
         Description = description ?? string.Empty;
         HealthInfo = healthInfo;
         PetAddress = petAddress;
         Weight = weight;
         Height = height;
         Vaccinated = vaccinated;
+        Photos = photos;
         PetStatus = petStatus;
-        PetType = petType;
-        CreatedAt = createdAt;
+        //PetType = petType;
         CreatedAt = DateTime.UtcNow;
+        Color = color;
     }
 
     private bool _isDeleted = false;
@@ -47,21 +47,23 @@ public class Pet : Entity<PetId>, ISoftDeletable
     private DateTime? _deletionDate;
     public DateTime? DeletionDate => _deletionDate;
 
+    public ValueObjectList<PetPhoto>? Photos { get; private set; } 
+
     public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; } = string.Empty;
 
-    public PetColor Color;
+    public PetColor Color { get; private set; }
 
     public string HealthInfo { get; private set; } = string.Empty;
 
-    public PetAddress PetAddress { get; private set; } = null!;
+    public Address PetAddress { get; private set; } = null!;
 
     public double? Weight { get; private set; }
 
     public double? Height { get; private set; }
 
-    public Phone OwnerPhone { get; private set; } = null!;
+    public Phone? OwnerPhone { get; private set; } 
 
     public bool? Castrated { get; private set; }
 
@@ -73,7 +75,7 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
     public DateTime CreatedAt { get; private set; }
 
-    public PetType PetType { get; private set; } = null!;
+    //public PetType PetType { get; private set; } 
 
 
     private readonly List<Requisites> _petRequisites = [];
@@ -130,4 +132,7 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
         _isDeleted = false;
     }
+
+    public void UpdateFilesList(ValueObjectList<PetPhoto> photos) =>
+        Photos = photos;
 }

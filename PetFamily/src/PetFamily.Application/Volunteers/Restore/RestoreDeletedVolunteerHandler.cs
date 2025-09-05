@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Database;
 using PetFamily.Contracts.Requests;
 using Shared;
 
@@ -7,11 +8,14 @@ namespace PetFamily.Application.Volunteers.Restore;
 public class RestoreDeletedVolunteerHandler
 {
     private readonly IVolunteersRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<RestoreDeletedVolunteerHandler> _logger;
     public RestoreDeletedVolunteerHandler(IVolunteersRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<RestoreDeletedVolunteerHandler> logger)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -41,7 +45,7 @@ public class RestoreDeletedVolunteerHandler
         }
         volunteer.Restore();
 
-        await _repository.Save(volunteer, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Волонтёр : {volunteerId} восстановлен", request.Id);
 
         return request.Id;

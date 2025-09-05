@@ -7,9 +7,9 @@ public interface IVolunteersRepository
 {
     Task<Guid> Add(Volunteer volunteer, CancellationToken cancellationToken);
 
-    Task<Result<Guid>> Save(Volunteer volunteer, CancellationToken cancellationToken);
+    Guid Save(Volunteer volunteer, CancellationToken cancellationToken);
 
-    Task<Guid> Delete(Volunteer volunteer, CancellationToken cancellationToken);
+    Guid Delete(Volunteer volunteer, CancellationToken cancellationToken);
 
     Task<Result<Volunteer>> GetById(Guid volunteerId, CancellationToken cancellationToken);
 

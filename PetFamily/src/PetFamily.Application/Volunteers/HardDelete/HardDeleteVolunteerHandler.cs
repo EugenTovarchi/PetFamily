@@ -34,7 +34,8 @@ public class HardDeleteVolunteerHandler
 
         var volunteer = volunteerResult.Value;
 
-        await _repository.Delete(volunteer, cancellationToken);
+        _repository.Delete(volunteer, cancellationToken); //оставляем метод синхронным ? 
+
         _logger.LogInformation("Волонтёр: {volunteerId} полностью удалён ", request.Id);
 
         return request.Id;

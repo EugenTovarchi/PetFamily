@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Database;
 using PetFamily.Contracts.Requests;
 using PetFamily.Domain.Shared;
 using Shared;
@@ -8,11 +9,14 @@ namespace PetFamily.Application.Volunteers.UpdateMainInfoCommand;
 public class UpdateMainInfoHandler
 {
     private readonly IVolunteersRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateMainInfoHandler> _logger;
     public UpdateMainInfoHandler(IVolunteersRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<UpdateMainInfoHandler> logger)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -60,7 +64,7 @@ public class UpdateMainInfoHandler
             experienceYears
         );
 
-        await _repository.Save(volunteer.Value, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Данные волонтёра : {volunteerId} обновлены ", volunteerId);
 
         return volunteer.Value.Id.Value;

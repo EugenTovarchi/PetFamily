@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Database;
 using PetFamily.Contracts.Requests;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using Shared;
@@ -8,11 +9,14 @@ namespace PetFamily.Application.Volunteers.UpdateRequisitesCommand;
 public class UpdateRequisitesHandler
 {
     private readonly IVolunteersRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateRequisitesHandler> _logger;
     public UpdateRequisitesHandler(IVolunteersRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<UpdateRequisitesHandler> logger)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -37,17 +41,14 @@ public class UpdateRequisitesHandler
             .Select(sm => Requisites.Create(sm.Title, sm.Instruction, sm.Value).Value)
             .ToList();
 
-        //volunteer.Value.UpdateRequisites(requisites);
         var updateResult = volunteer.Value.UpdateRequisites(requisites);
         if (updateResult.IsFailure)
         {
             return Result<Guid>.Failure(updateResult.Error);
         }
 
-        await _repository.Save(volunteer.Value, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Реквизиты волонтёра : {volunteerId} обновлены ", request.Id);
-
-        
 
         return volunteer.Value.Id.Value;
     }

@@ -7,7 +7,7 @@ namespace PetFamily.Infrastructure.Repositories;
 
 public class VolunteersRepository : IVolunteersRepository
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly ApplicationDbContext _dbContext;  
 
     public VolunteersRepository(ApplicationDbContext dbContext )
     {
@@ -20,10 +20,9 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer.Id;
     }
 
-    public async Task<Guid> Delete(Volunteer volunteer, CancellationToken cancellationToken = default)
+    public Guid Delete(Volunteer volunteer, CancellationToken cancellationToken = default)
     {
         _dbContext.Volunteers.Remove(volunteer);
-        await _dbContext.SaveChangesAsync(cancellationToken);
         return volunteer.Id;
     }
 
@@ -55,9 +54,9 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer;
     }
 
-    public async Task<Result<Guid>> Save(Volunteer volunteer, CancellationToken cancellationToken)
+    public Guid Save(Volunteer volunteer, CancellationToken cancellationToken = default)
     {
-        await _dbContext.SaveChangesAsync(cancellationToken);
+         _dbContext.Volunteers.Attach(volunteer);
 
         return volunteer.Id.Value;
     }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using PetFamily.Application.Database;
 using PetFamily.Application.Volunteers.DeleteCommand;
 using Shared;
 
@@ -7,11 +8,14 @@ namespace PetFamily.Application.Volunteers.SoftDelete;
 public class SoftDeleteVolunteerHandler
 {
     private readonly IVolunteersRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<SoftDeleteVolunteerHandler> _logger;
     public SoftDeleteVolunteerHandler(IVolunteersRepository repository,
+        IUnitOfWork unitOfWork,
         ILogger<SoftDeleteVolunteerHandler> logger)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -42,7 +46,7 @@ public class SoftDeleteVolunteerHandler
 
         volunteer.Delete();
 
-        await _repository.Save(volunteer, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Волонтёр : {volunteerId} отмечен как удалён в БД", request.Id);
 
         return request.Id;

@@ -1,5 +1,6 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.CreateVolunteer;
 using PetFamily.Application.Volunteers.HardDelete;
 using PetFamily.Application.Volunteers.Restore;
@@ -20,7 +21,9 @@ public static class DependencyInjection
         services.AddScoped<HardDeleteVolunteerHandler>();
         services.AddScoped<UpdateSocialMediasHandler>();
         services.AddScoped<UpdateRequisitesHandler>(); 
-        services.AddScoped<RestoreDeletedVolunteerHandler>();  
+        services.AddScoped<RestoreDeletedVolunteerHandler>();
+        services.AddScoped<AddPetHandler>();
+
 
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);

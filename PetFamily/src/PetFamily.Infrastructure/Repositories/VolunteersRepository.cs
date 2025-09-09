@@ -1,5 +1,6 @@
+using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
-using PetFamily.Application.Volunteers;
+using PetFamily.Application.Database;
 using PetFamily.Domain.PetManagment.AggregateRoot;
 using Shared;
 
@@ -26,7 +27,7 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer.Id;
     }
 
-    public async Task<Result<Volunteer>> GetById(Guid volunteerId, CancellationToken cancellationToken)
+    public async Task<Result<Volunteer,Error>> GetById(Guid volunteerId, CancellationToken cancellationToken)
     {
         var volunteer = await _dbContext.Volunteers
             .Include(v=>v.Pets)
@@ -38,7 +39,7 @@ public class VolunteersRepository : IVolunteersRepository
         return volunteer;
     }
 
-    public async Task<Result<Volunteer>> GetByName(string firstName, string lastName, string? middleName, CancellationToken cancellationToken)
+    public async Task<Result<Volunteer, Error>> GetByName(string firstName, string lastName, string? middleName, CancellationToken cancellationToken)
     {
         var volunteer = await _dbContext.Volunteers
             .Include(v => v.Pets)

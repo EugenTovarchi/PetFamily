@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Application.FileProvider;
@@ -32,8 +33,8 @@ public class AddPetHandler
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(
-        AddPetCommand command,  //данные приходящие с FrontEnd
+    public async Task<Result<Guid,Failure>> Handle(
+        AddPetCommand command,  
         CancellationToken cancellationToken = default)
     {
         //точка старта транзакции
@@ -49,7 +50,7 @@ public class AddPetHandler
             {
                 _logger.LogWarning("Волонтёр {request.Id} не существует!", command.VolunteerId);
 
-                return Errors.Volunteer.NotFound("volunteer");
+                return Errors.Volunteer.NotFound("volunteer").ToFailure();
             }
 
             var petId = PetId.NewPetId();
@@ -81,7 +82,7 @@ public class AddPetHandler
 
                 var photoPath = PhotoPath.Create(Guid.NewGuid(), extension);
                 if (photoPath.IsFailure)
-                    return photoPath.Error;
+                    return photoPath.Error.ToFailure();
 
                 //Создание объекта с данными фото
                 var photoContent = new PhotoData(photo.Stream, photoPath.Value, BUCKET_NAME);
@@ -99,6 +100,13 @@ public class AddPetHandler
                 .Select(p => new PetPhoto(p))
                 .ToList();
 
+            var speciesId = SpeciesId.Create(command.SpeciesId);
+            var breedId = BreedId.Create(command.BreedId);
+
+            var petTypeResult = PetType.Create(speciesId, breedId);
+            if(petTypeResult.IsFailure)
+                return petTypeResult.Error.ToFailure();
+
             var pet = new Pet(
                 petId,
                 petName,
@@ -108,6 +116,7 @@ public class AddPetHandler
                 vaccinated,
                 height,
                 weight,
+                petTypeResult.Value,
                 DateTime.UtcNow,
                 petPhotos,
                 petColor,
@@ -121,7 +130,7 @@ public class AddPetHandler
             var uploadResult = await _fileProvider.UploadFiles(photosData, cancellationToken);
 
             if (uploadResult.IsFailure)
-                return uploadResult.Error;
+                return uploadResult.Error.ToFailure();
 
              transaction.Commit();
 
@@ -134,7 +143,7 @@ public class AddPetHandler
 
             transaction.Rollback();
 
-            return Error.Failure("Can not add pet to volunteer - {id}", "volunteer.pet.failure");
+            return Errors.Pet.AddToVolunteer("Can not add pet to volunteer - {id}").ToFailure();
         }
     }
 }

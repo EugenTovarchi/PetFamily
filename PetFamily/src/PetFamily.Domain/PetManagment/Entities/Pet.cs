@@ -1,12 +1,14 @@
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using PetFamily.Domain.Shared;
 using PetFamily.Domain.Shared.ValueObjects;
 using Shared;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
-public class Pet : Entity<PetId>, ISoftDeletable
+public class Pet : Shared.Entity<PetId>, ISoftDeletable
 {
     private Pet(PetId id) : base(id) { }
 
@@ -19,7 +21,7 @@ public class Pet : Entity<PetId>, ISoftDeletable
         bool vaccinated,
         double height,
         double weight,
-        //PetType petType,
+        PetType petType,
         DateTime createdAt,
         ValueObjectList<PetPhoto> photos, 
         PetColor color ,
@@ -36,7 +38,7 @@ public class Pet : Entity<PetId>, ISoftDeletable
         Vaccinated = vaccinated;
         Photos = photos;
         PetStatus = petStatus;
-        //PetType = petType;
+        PetType = petType;
         CreatedAt = DateTime.UtcNow;
         Color = color;
     }
@@ -75,14 +77,14 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
     public DateTime CreatedAt { get; private set; }
 
-    //public PetType PetType { get; private set; } 
+    public PetType PetType { get; private set; } = null!;
 
 
     private readonly List<Requisites> _petRequisites = [];
 
     public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.ToList();
 
-    public Result<Requisites> AddRequisites(Requisites requisite)
+    public UnitResult<Error> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -91,10 +93,10 @@ public class Pet : Entity<PetId>, ISoftDeletable
             return Errors.General.ValueIsEmptyOrWhiteSpace("Title");
 
         _petRequisites.Add(requisite);
-        return requisite;
+        return Result.Success<Error>();
     }
 
-    public Result RemoveRequisites(Requisites requisite)
+    public UnitResult<Error> RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -103,16 +105,18 @@ public class Pet : Entity<PetId>, ISoftDeletable
             return Errors.General.NotFoundValue("requisite.Title");
 
         _petRequisites.Remove(requisite);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
-    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
+    public UnitResult<Error> UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
     {
         var removeResult = RemoveRequisites(oldRequisite);
         if (removeResult.IsFailure)
-            return removeResult;
+            return removeResult.Error;
 
-        return AddRequisites(newRequisite);
+        AddRequisites(newRequisite);
+
+        return Result.Success<Error>();
     }
 
     public void Delete()

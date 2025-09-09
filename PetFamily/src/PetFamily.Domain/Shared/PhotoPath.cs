@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Shared;
 
 namespace PetFamily.Domain.Shared;
@@ -11,7 +12,7 @@ public record PhotoPath
 
     public string Path { get; }
 
-    public static Result<PhotoPath> Create(Guid path, string extension)
+    public static Result<PhotoPath,Error> Create(Guid path, string extension)
     {
         if (string.IsNullOrWhiteSpace(extension))
         {

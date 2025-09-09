@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
@@ -21,7 +22,7 @@ public class MinioProvider : IFileProvider
         _logger = logger;
     }
 
-    public async Task<Result<IReadOnlyList<PhotoPath>>> UploadFiles(
+    public async Task<Result<IReadOnlyList<PhotoPath>,Error>> UploadFiles(
         IEnumerable<PhotoData> photosData,
         CancellationToken cancellationToken = default)
     {
@@ -55,11 +56,11 @@ public class MinioProvider : IFileProvider
             _logger.LogError(ex,
                 "Fail to upload files in minio, files amount: {amount}", filesList.Count);
 
-            return Error.Failure("file.upload", "Fail to upload files in minio");
+            return Error.Failure("file.upload", "Fail to upload file in minio");
         }
     }
 
-    private async Task<Result<PhotoPath>> PutObject(
+    private async Task<Result<PhotoPath,Error>> PutObject(
         PhotoData photoData,
         SemaphoreSlim semaphoreSlim,
         CancellationToken cancellationToken)

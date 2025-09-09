@@ -1,24 +1,22 @@
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.ValueObjects;
-using System.ComponentModel;
-using System.IO;
-using System.Reflection;
 
 namespace Shared.Extensions;
 
 public static class EnumExtension
 {
-    public static Result<PetStatus> ParsePetStatus(string status)
+    public static Result<PetStatus, Failure> ParsePetStatus(string status)
     {
         return status.ToLower() switch
         {
             "lookingtreatment" => PetStatus.LookingTreatment,
             "lookinghome" => PetStatus.LookingHome,
             "hashome" => PetStatus.HasHome,
-            _ => Errors.General.ValueIsInvalid(nameof(status))
+            _ => Errors.General.ValueIsInvalid(nameof(status)).ToFailure()
         };
     }
 
-    public static Result<PetColor> ParsePetColor(string color)
+    public static Result<PetColor,Failure> ParsePetColor(string color)
     {
         var colorLower = color.ToLower().Trim();
         return colorLower switch
@@ -35,7 +33,7 @@ public static class EnumExtension
             "смешанный" => PetColor.Mixed,
             "чёрно-белый" or "черно-белый" => PetColor.BlackAndWhite,
 
-            _ => Errors.General.ValueIsInvalid(nameof(color))
+            _ => Errors.General.ValueIsInvalid(nameof(color)).ToFailure()
         };
     }   
 }

@@ -1,60 +1,74 @@
+using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
-using PetFamily.Contracts.Requests;
+using PetFamily.Contracts.Commands.Volunteer;
 using PetFamily.Domain.Shared;
 using Shared;
 
-namespace PetFamily.Application.Volunteers.UpdateMainInfoCommand;
+namespace PetFamily.Application.Volunteers.UpdateMainInfo;
 
 public class UpdateMainInfoHandler
 {
     private readonly IVolunteersRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IValidator<UpdateMainInfoCommand> _validator;
     private readonly ILogger<UpdateMainInfoHandler> _logger;
-    public UpdateMainInfoHandler(IVolunteersRepository repository,
+    public UpdateMainInfoHandler(
+        IVolunteersRepository repository,
         IUnitOfWork unitOfWork,
+        IValidator<UpdateMainInfoCommand> validator,
         ILogger<UpdateMainInfoHandler> logger)
     {
         _repository = repository;
         _unitOfWork = unitOfWork;
+        _validator = validator;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(UpdateMainInfoRequest request,
+    public async Task<Result<Guid, Failure>> Handle(UpdateMainInfoCommand command,
         CancellationToken cancellationToken = default)
     {
-        if (request is null)
-            return Errors.General.ValueIsInvalid("request");
+        if (command is null)
+            return Errors.General.ValueIsInvalid("command").ToFailure();
+
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            _logger.LogWarning("Волонтёр {command.Id} не валиден!", command.Id);
+
+            return validationResult.ToErrors();
+        }
 
         var volunteer = await _repository.GetById(
-           request.Id,
+           command.Id,
             cancellationToken);
 
         if (!volunteer.IsSuccess)
         {
-            _logger.LogWarning("Волонтёр {request.Id} не существует!", request.Id);
+            _logger.LogWarning("Волонтёр {command.Id} не существует!", command.Id);
 
-            return Errors.Volunteer.NotFound("volunteer");
+            return Errors.Volunteer.NotFound("volunteer").ToFailure();
         }
 
-        var fullName = request.Dto.FullName.MiddleName is null
+        var fullName = command.Request.FullName.MiddleName is null
         ? FullName.Create(
-            request.Dto.FullName.FirstName,
-            request.Dto.FullName.LastName)
+            command.Request.FullName.FirstName,
+            command.Request.FullName.LastName)
         : FullName.CreateWithMiddle(
-            request.Dto.FullName.FirstName,
-            request.Dto.FullName.LastName,
-            request.Dto.FullName.MiddleName);
+            command.Request.FullName.FirstName,
+            command.Request.FullName.LastName,
+            command.Request.FullName.MiddleName);
 
-        var volunteerId = VolunteerId.Create(request.Id);
+        var volunteerId = VolunteerId.Create(command.Id);
 
-        var phone = Phone.Create(request.Dto.Phone).Value;
+        var phone = Phone.Create(command.Request.Phone).Value;
 
-        var email = Email.Create(request.Dto.Email).Value;
+        var email = Email.Create(command.Request.Email).Value;
 
-        var volunteerInfo = request.Dto.VolunteerInfo;
+        var volunteerInfo = command.Request.VolunteerInfo;
 
-        var experienceYears = request.Dto.ExperienceYears;
+        var experienceYears = command.Request.ExperienceYears;
 
         volunteer.Value.UpdateMainInfo(
             fullName.Value,

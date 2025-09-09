@@ -1,4 +1,5 @@
-namespace Shared;
+using Shared;
+using static Errors;
 
 public static class Errors
 {
@@ -50,6 +51,11 @@ public static class Errors
         {
             return Error.Validation("value.not.positive", $"{field} can not be negative.");
         }
+
+        public static Error NotFoundEntity(string? field = null)
+        {
+            return Error.NotFound("entity.not.found", $"entity not found {field}");
+        }
     }
 
     public static class Volunteer
@@ -69,6 +75,30 @@ public static class Errors
         public static Error RecordIsInvalid(string? field = null)
         {
             return Error.Validation("record.is.invalid", $"{field} is invalid.");
+        }
+    }
+
+    public static class Pet
+    {
+        public static Error CreateError(string? field = null)
+        {
+            return Error.Validation("entity.not.created", $"{field} has problem.");
+        }
+        public static Error NotFound(string? field = null)
+        {
+            return Error.NotFound("value.not.found", $"velue not found {field}");
+        }
+        public static Error AddToVolunteer(string? field = null )
+        {
+            return Error.Validation("entity.not.added", $"{field} has problem.");
+        }
+    }
+
+    public static class Minio
+    {
+        public static Error FailUpload(string? field = null)
+        {
+            return Error.Failure("files.not.uploaded", $"fail to  upload {field} files.");
         }
     }
 }

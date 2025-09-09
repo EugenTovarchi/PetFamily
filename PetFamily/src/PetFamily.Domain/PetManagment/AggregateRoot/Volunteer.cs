@@ -1,12 +1,14 @@
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 using Shared;
 using Constants = Shared.Constants.Constants;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
 
-public class Volunteer : Entity<VolunteerId>, ISoftDeletable
+public class Volunteer : Shared.Entity<VolunteerId>, ISoftDeletable
 {
     private Volunteer(VolunteerId id) : base(id) { }
 
@@ -61,26 +63,26 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
     public int LookingHomePets => CountPetsByStatus(PetStatus.LookingHome);
     public int HaveHomePets => CountPetsByStatus(PetStatus.HasHome);
 
-    public Result UpdateInfo(string newVolunteernfo)
+    public UnitResult<Error> UpdateInfo(string newVolunteernfo)
     {
         if(string.IsNullOrEmpty(newVolunteernfo) || newVolunteernfo.Length > Constants.MAX_INFO_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("newVolunteernfo");
 
         VolunteerInfo= newVolunteernfo;
 
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
-    public Result UpdateExperienceYears(decimal newExperienceYears)
+    public UnitResult<Error> UpdateExperienceYears(decimal newExperienceYears)
     {
         if(newExperienceYears < 0)
             return Errors.General.ValueMustBePositive("newVolunteernfo");
 
         ExperienceYears = newExperienceYears;
 
-        return Result.Success();
+        return Result.Success<Error>();
     }
-    public Result AddPet(Pet pet)
+    public UnitResult<Error> AddPet(Pet pet)
     {
         if (pet == null)
             return Errors.General.ValueIsInvalid("pet");
@@ -89,10 +91,10 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
             return Errors.General.Duplicate("pet");
 
         _pets.Add(pet);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
-    public Result RemovePet(Pet pet)
+    public UnitResult<Error> RemovePet(Pet pet)
     {
         if (pet is null)
             return Errors.General.ValueIsInvalid("pet");
@@ -101,10 +103,10 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
             return Errors.General.NotFound(pet.Id);
 
         _pets.Remove(pet);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
-    public Result EditPetInfo(Pet oldPetInfo, Pet newPetInfo)
+    public UnitResult<Error> EditPetInfo(Pet oldPetInfo, Pet newPetInfo)
     {
         var removeResult = RemovePet(oldPetInfo);
         if (removeResult.IsFailure)
@@ -114,7 +116,7 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
     }
 
 
-    public Result<Requisites> AddRequisites(Requisites requisite)
+    public Result<Requisites,Error> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -126,7 +128,7 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         return requisite;
     }
 
-    public Result RemoveRequisites(Requisites requisite)
+    public UnitResult<Error> RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -135,10 +137,10 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
             return Errors.General.NotFoundValue("requisite");
 
         _volunteerRequisites.Remove(requisite);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
-    public Result UpdateRequisites(IEnumerable<Requisites> requisites)
+    public UnitResult<Error> UpdateRequisites(IEnumerable<Requisites> requisites)
     {
         if (requisites is null)
             return Errors.General.ValueIsInvalid("requisites");
@@ -146,11 +148,11 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         _volunteerRequisites.Clear();
 
         _volunteerRequisites.AddRange(requisites);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
 
-    public Result AddSocialMedia(VolunteerSocialMedia socialMedia)
+    public UnitResult<Error> AddSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
             return Errors.General.ValueIsInvalid("socialMedia");
@@ -159,9 +161,9 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
             return Errors.General.Duplicate("socialMedia.Title");
 
         _volunteerSocialMedias.Add(socialMedia);
-        return Result.Success();
+        return Result.Success<Error>();
     }
-    public Result RemoveSocialMedia(VolunteerSocialMedia socialMedia)
+    public UnitResult<Error> RemoveSocialMedia(VolunteerSocialMedia socialMedia)
     {
         if (socialMedia is null)
             return Errors.General.ValueIsInvalid("socialMedia");
@@ -170,7 +172,7 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
             return Errors.General.NotFoundValue("socialMedia.Title");
 
         _volunteerSocialMedias.Remove(socialMedia);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
     private int CountPetsByStatus(PetStatus status)
@@ -195,7 +197,7 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         ExperienceYears = experienceYears;
     }
 
-    public Result UpdateSocialMedias(IEnumerable<VolunteerSocialMedia> socialMedias)
+    public UnitResult<Error> UpdateSocialMedias(IEnumerable<VolunteerSocialMedia> socialMedias)
     {
         if (socialMedias is null)
             return Errors.General.ValueIsInvalid("socialMedias");
@@ -203,7 +205,7 @@ public class Volunteer : Entity<VolunteerId>, ISoftDeletable
         _volunteerSocialMedias.Clear();
 
         _volunteerSocialMedias.AddRange(socialMedias);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
     public void Delete()

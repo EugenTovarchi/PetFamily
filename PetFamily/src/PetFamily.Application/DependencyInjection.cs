@@ -5,8 +5,8 @@ using PetFamily.Application.Volunteers.CreateVolunteer;
 using PetFamily.Application.Volunteers.HardDelete;
 using PetFamily.Application.Volunteers.Restore;
 using PetFamily.Application.Volunteers.SoftDelete;
-using PetFamily.Application.Volunteers.UpdateMainInfoCommand;
-using PetFamily.Application.Volunteers.UpdateRequisitesCommand;
+using PetFamily.Application.Volunteers.UpdateMainInfo;
+using PetFamily.Application.Volunteers.UpdateRequisites;
 using PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
 
 namespace PetFamily.Infrastructure;

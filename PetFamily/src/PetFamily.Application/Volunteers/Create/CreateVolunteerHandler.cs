@@ -1,5 +1,8 @@
+using CSharpFunctionalExtensions;
+using FluentValidation;
 using Microsoft.Extensions.Logging;
-using PetFamily.Contracts.Requests;
+using PetFamily.Application.Database;
+using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.AggregateRoot;
 using PetFamily.Domain.Shared;
 using Shared;
@@ -10,47 +13,65 @@ public class CreateVolunteerHandler
 {
     private readonly IVolunteersRepository _repository;
     private readonly ILogger<CreateVolunteerHandler> _logger;
-    public CreateVolunteerHandler(IVolunteersRepository repository,
+    private readonly IValidator<CreateVolunteerCommand> _validator;
+
+
+    public CreateVolunteerHandler(
+        IVolunteersRepository repository,
+        IValidator <CreateVolunteerCommand> validator,
         ILogger<CreateVolunteerHandler> logger)
     {
         _repository = repository;
+        _validator = validator;
         _logger = logger;
     }
 
-    public async Task<Result<Guid>> Handle(CreateVolunteerRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<Guid,Failure>> Handle(CreateVolunteerCommand command, CancellationToken cancellationToken = default)
     {
-        if (request is null)
-            return Errors.General.ValueIsInvalid("request");
+        if (command is null)
+            return Errors.Validation.RecordIsInvalid("command").ToFailure();
+
+        var validationResult = await _validator.ValidateAsync(command, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            _logger.LogWarning("Волонтёр {command.FullName.FirstName}" +
+                "  {command.FullName.LastName} не валиден!",
+                command.FullName.FirstName,
+                command.FullName.LastName);
+
+            return validationResult.ToErrors();
+        }
 
         var existVolunteer = await _repository.GetByName(
-            request.FullName.FirstName,
-            request.FullName.LastName,
-            request.FullName.MiddleName,
+            command.FullName.FirstName,
+            command.FullName.LastName,
+            command.FullName.MiddleName,
             cancellationToken);
 
         if (existVolunteer.IsSuccess)
         {
             _logger.LogWarning("Волонтёр: {FirstName} {LastName} уже существует!",
-                request.FullName.FirstName,
-                request.FullName.LastName);
+                command.FullName.FirstName,
+                command.FullName.LastName);
 
-            return Errors.General.Duplicate("existVolunteer");
+            return Errors.General.Duplicate("existVolunteer").ToFailure();
         }
 
-        var fullName = request.FullName.MiddleName is null
+        var fullName = command.FullName.MiddleName is null
         ? FullName.Create(
-        request.FullName.FirstName!,
-        request.FullName.LastName)
+        command.FullName.FirstName!,
+        command.FullName.LastName)
         : FullName.CreateWithMiddle(
-            request.FullName.FirstName,
-            request.FullName.LastName,
-            request.FullName.MiddleName);
+            command.FullName.FirstName,
+            command.FullName.LastName,
+            command.FullName.MiddleName);
 
         var volunteerId = VolunteerId.NewVolunteerId();
 
-        var phone = Phone.Create(request.Phone).Value;
+        var phone = Phone.Create(command.Phone).Value;
 
-        var email = Email.Create(request.Email).Value;
+        var email = Email.Create(command.Email).Value;
 
         var volunteer = new Volunteer
         (
@@ -58,8 +79,8 @@ public class CreateVolunteerHandler
             fullName.Value,
             email,
             phone,
-            request.VolunteerInfo,
-            request.ExperienceYears
+            command.VolunteerInfo,
+            command.ExperienceYears
         );
 
         await _repository.Add(volunteer, cancellationToken);

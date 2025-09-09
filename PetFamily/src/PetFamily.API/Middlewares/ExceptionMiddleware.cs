@@ -1,5 +1,4 @@
 using Shared;
-using System.Diagnostics;
 
 namespace PetFamily.API.Middlewares;
 
@@ -37,8 +36,8 @@ public class ExceptionMiddleware
             context.Response.StatusCode,
             ex.Message);
 
-            var responseError = new ResponseError("server.internal", ex.Message, null);
-            var envelope = Envelope.Error([responseError]);
+            var error = Error.Failure("server.internal", ex.Message);
+            var envelope = Envelope.Error(error); //убрал ([error]) - ругался компилятор и требовал конструктор 
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

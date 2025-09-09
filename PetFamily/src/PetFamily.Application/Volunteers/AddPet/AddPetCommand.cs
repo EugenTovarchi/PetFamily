@@ -1,5 +1,6 @@
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.FileProviderData;
+using PetFamily.Domain.PetManagment.ValueObjects;
 
 namespace PetFamily.Application.Volunteers.AddPet;
 
@@ -13,6 +14,8 @@ public record AddPetCommand(
     bool Vaccinated,
     double Height,
     double Weight,
+    Guid SpeciesId,
+    Guid BreedId,
     IEnumerable<CreateFileDto> Files, //не будет передаваться должным образом ? 
     string Color,
     string PetStatus = "LookingTreatment");

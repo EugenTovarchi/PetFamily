@@ -1,17 +1,17 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using PetFamily.API.Processors;
 using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.CreateVolunteer;
-using PetFamily.Application.Volunteers.DeleteCommand;
 using PetFamily.Application.Volunteers.HardDelete;
 using PetFamily.Application.Volunteers.Restore;
 using PetFamily.Application.Volunteers.SoftDelete;
-using PetFamily.Application.Volunteers.UpdateMainInfoCommand;
-using PetFamily.Application.Volunteers.UpdateRequisitesCommand;
+using PetFamily.Application.Volunteers.UpdateMainInfo;
+using PetFamily.Application.Volunteers.UpdateRequisites;
 using PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
-using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Commands.Volunteer;
+using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Contracts.Requests;
+using PetFamily.Contracts.Requests.Volunteers;
 using Shared;
 
 namespace PetFamily.API.Controllers;
@@ -22,24 +22,20 @@ public class VolunteersController : ApplicationController
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromServices] CreateVolunteerHandler handler,
-        [FromServices] IValidator<CreateVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         [FromBody] CreateVolunteerRequest request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        var command = new CreateVolunteerCommand(
+            request.FullName,
+            request.Phone,
+            request.Email,
+            request.VolunteerInfo,
+            request.ExperienceYears,
+            request.VolunteerSocialMediaDtos,
+            request.RequisitesDtos);
 
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.FullName.FirstName}" +
-                "  {request.FullName.LastName} не валиден!",
-                request.FullName.FirstName,
-                request.FullName.LastName);
-
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken); 
 
         if (result.IsFailure)
             return result.Error.ToResponse();
@@ -50,22 +46,14 @@ public class VolunteersController : ApplicationController
     [HttpPut("main-info/{id:guid}")]
     public async Task<IActionResult> Update(
         [FromRoute] Guid id,
-        [FromBody] UpdateMainInfoDto dto,
+        [FromBody] UpdateMainInfoRequest request,
         [FromServices] UpdateMainInfoHandler handler,
-        [FromServices] IValidator<UpdateMainInfoRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new UpdateMainInfoRequest(id, dto);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.Id} не валиден!", request.Id);
+        var command = new UpdateMainInfoCommand(id,request);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -76,20 +64,12 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> SoftDelete(
         [FromRoute] Guid id,
         [FromServices] SoftDeleteVolunteerHandler handler,
-        [FromServices] IValidator<DeleteVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new DeleteVolunteerRequest(id);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.Id} не валиден!", request.Id);
+        var command = new SoftDeleteVolunteerCommand(id);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -100,20 +80,12 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> HardDelete(
         [FromRoute] Guid id,
         [FromServices] HardDeleteVolunteerHandler handler,
-        [FromServices] IValidator<DeleteVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new DeleteVolunteerRequest(id);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.Id} не валиден!", request.Id);
+        var command = new HardDeleteVolunteerCommand(id);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -124,20 +96,12 @@ public class VolunteersController : ApplicationController
     public async Task<IActionResult> Restore(
         [FromRoute] Guid id,
         [FromServices] RestoreDeletedVolunteerHandler handler,
-        [FromServices] IValidator<RestoreVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new RestoreVolunteerRequest(id);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Id волонтёра {request.Id} не валидно!", request.Id);
+        var command = new RestoreVolunteerCommand(id);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -147,22 +111,14 @@ public class VolunteersController : ApplicationController
     [HttpPut("social-medias/{id:guid}")]
     public async Task<IActionResult> UpdateSocialMedia(
         [FromRoute] Guid id,
-        [FromBody] UpdateSocialMediaDto dto,
+        [FromBody] UpdateSocialMediaRequest request,
         [FromServices] UpdateSocialMediasHandler handler,
-        [FromServices] IValidator<UpdateSocialMediaDto> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new UpdateSocialMediaRequest(id, dto);
-        var validationResult = await _validator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Социальные сети {request.Id} не валидны!", request.Id);
+        var command = new UpdateSocialMediaCommand(id, request);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -172,22 +128,14 @@ public class VolunteersController : ApplicationController
     [HttpPut("requisites/{id:guid}")]
     public async Task<IActionResult> UpdateRequisites(
         [FromRoute] Guid id,
-        [FromBody] UpdateRequisitesDto dto,
+        [FromBody] UpdateRequisitesRequest request,
         [FromServices] UpdateRequisitesHandler handler,
-        [FromServices] IValidator<UpdateRequisitesDto> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new UpdateRequisitesRequest(id, dto);
-        var validationResult = await _validator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Реквизиты {request.Id} не валидны!", request.Id);
+        var command = new UpdateRequisitesCommand(id, request);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
@@ -213,6 +161,8 @@ public class VolunteersController : ApplicationController
             request.Vaccinated,
             request.Height,
             request.Weight,
+            request.SpeciesId,
+            request.BreedId,
             fileDtos,
             request.Color,
             request.PetStatus);

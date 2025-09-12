@@ -17,7 +17,6 @@ public class UploadPetPhotosHandler
 
     private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteerRepository;
-    private readonly ISpeciesRepository _speciesRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<UploadPetPhotosCommand> _validator; 
     private readonly ILogger<UploadPetPhotosHandler> _logger;
@@ -25,14 +24,12 @@ public class UploadPetPhotosHandler
     public UploadPetPhotosHandler(
         IFileProvider fileProvider,
         IVolunteersRepository volunteerRepository,
-        ISpeciesRepository speciesRepository,
         IUnitOfWork unitOfWork,
         IValidator<UploadPetPhotosCommand> validator,
         ILogger<UploadPetPhotosHandler> logger)
     {
         _fileProvider = fileProvider;
         _volunteerRepository = volunteerRepository;
-        _speciesRepository = speciesRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
         _logger = logger;

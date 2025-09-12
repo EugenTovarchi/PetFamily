@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
-using Minio;
 using PetFamily.API.Processors;
 using PetFamily.Application.Volunteers.AddPet;
-using PetFamily.Application.Volunteers.CreateVolunteer;
+using PetFamily.Application.Volunteers.Create;
+using PetFamily.Application.Volunteers.DeletePetPhotos;
+using PetFamily.Application.Volunteers.GetPetPhotos;
 using PetFamily.Application.Volunteers.HardDelete;
 using PetFamily.Application.Volunteers.Restore;
 using PetFamily.Application.Volunteers.SoftDelete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
 using PetFamily.Application.Volunteers.UpdateRequisites;
-using PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
+using PetFamily.Application.Volunteers.UpdateSocialMedias;
 using PetFamily.Application.Volunteers.UploadPetPhotos;
-using PetFamily.Contracts.Commands.Volunteer;
 using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Contracts.Requests.Volunteers;
 using Shared;
@@ -185,6 +185,42 @@ public class VolunteersController : ApplicationController
         var fileDtos = fileProcessor.Process(files);
 
         var command = new UploadPetPhotosCommand(volunteerId, petId, fileDtos);
+
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/pet-photos")]
+    public async Task<ActionResult> DeletePhotos(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] DeletePetPhotosRequest request,
+        [FromServices] DeletePetPhotosHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeletePetPhotosCommand(volunteerId, petId, request);
+
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("{volunteerId:guid}/pet/{petId:guid}/pet-photos")]
+    public async Task<ActionResult> GetPhotos(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] GetPetPhotosRequest request,
+        [FromServices] GetPetPhotosHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new GetPetPhotosCommand(volunteerId, petId, request);
 
         var result = await handler.Handle(command, cancellationToken);
 

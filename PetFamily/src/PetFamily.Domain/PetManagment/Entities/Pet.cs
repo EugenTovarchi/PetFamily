@@ -139,4 +139,21 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
 
     public void UpdatePhotos(ValueObjectList<PetPhoto> photos) =>
         Photos = photos;
+
+    public UnitResult<Error> RemovePhotos(IEnumerable<string> deletedPaths)
+    {
+        if (deletedPaths is null || !deletedPaths.Any())
+            return Errors.General.ValueIsEmptyOrWhiteSpace(nameof(deletedPaths));
+
+        if (Photos is null || !Photos.Any())
+            return Result.Success<Error>(); 
+
+        var remainingPhotos = Photos
+            .Where(photo => !deletedPaths.Contains(photo.PathToStorage.Path))
+            .ToList();
+
+        Photos = new ValueObjectList<PetPhoto>(remainingPhotos);
+
+        return Result.Success<Error>();
+    }
 }

@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.Entities;
+using PetFamily.Domain.PetManagment.Extensions;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using Shared;
-using Shared.Extensions;
 
 namespace PetFamily.Application.Volunteers.AddPet;
 

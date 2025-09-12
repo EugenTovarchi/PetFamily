@@ -7,7 +7,7 @@ using PetFamily.Domain.PetManagment.AggregateRoot;
 using PetFamily.Domain.Shared;
 using Shared;
 
-namespace PetFamily.Application.Volunteers.CreateVolunteer;
+namespace PetFamily.Application.Volunteers.Create;
 
 public class CreateVolunteerHandler
 {

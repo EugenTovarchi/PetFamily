@@ -2,7 +2,7 @@ using FluentValidation;
 using PetFamily.Application.Validation;
 using PetFamily.Contracts.Commands.Volunteers;
 
-namespace PetFamily.Application.Volunteers.DeleteCommand;
+namespace PetFamily.Application.Volunteers.SoftDelete;
 
 public class SoftDeleteVolunteerValidation : AbstractValidator<SoftDeleteVolunteerCommand>
 {

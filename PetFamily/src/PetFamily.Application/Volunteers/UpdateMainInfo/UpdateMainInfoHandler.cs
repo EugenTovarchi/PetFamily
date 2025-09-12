@@ -2,7 +2,7 @@ using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
-using PetFamily.Contracts.Commands.Volunteer;
+using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.Shared;
 using Shared;
 

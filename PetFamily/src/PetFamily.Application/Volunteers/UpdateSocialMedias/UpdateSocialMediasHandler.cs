@@ -6,7 +6,7 @@ using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using Shared;
 
-namespace PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
+namespace PetFamily.Application.Volunteers.UpdateSocialMedias;
 
 public class UpdateSocialMediasHandler
 {

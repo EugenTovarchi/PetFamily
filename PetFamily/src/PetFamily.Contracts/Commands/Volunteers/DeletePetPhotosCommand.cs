@@ -2,7 +2,5 @@ using PetFamily.Contracts.Requests.Volunteers;
 
 namespace PetFamily.Contracts.Commands.Volunteers;
 
-public record UpdateMainInfoCommand(
-    Guid Id,
-    UpdateMainInfoRequest Request);
+public  record DeletePetPhotosCommand(Guid VolunteerId, Guid PetId, DeletePetPhotosRequest Request);
 

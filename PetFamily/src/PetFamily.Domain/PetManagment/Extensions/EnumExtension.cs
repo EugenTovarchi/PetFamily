@@ -1,7 +1,8 @@
 using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using Shared;
 
-namespace Shared.Extensions;
+namespace PetFamily.Domain.PetManagment.Extensions;
 
 public static class EnumExtension
 {

@@ -1,6 +1,6 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
-using PetFamily.Contracts.Commands.Volunteer;
+using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.Shared;
 
 namespace PetFamily.Application.Volunteers.UpdateMainInfo;

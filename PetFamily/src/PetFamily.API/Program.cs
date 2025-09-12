@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using PetFamily.API.Middlewares;
+using PetFamily.Application;
 using PetFamily.Infrastructure;
 using Serilog;
 using Serilog.Events;

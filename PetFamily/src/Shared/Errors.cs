@@ -18,7 +18,7 @@ public static class Errors
 
         public static Error NotFoundValue(string? field = null)
         {
-            return Error.NotFound("value.not.found", $"velue not found {field}");
+            return Error.NotFound("value.not.found", $"value not found {field}");
         }
 
         public static Error ValueIsRequired(string? name = null)

@@ -20,39 +20,39 @@ public record Address
         Flat = flat;
     }
 
-    public static Result<Address,Failure> Create(
+    public static Result<Address,Error> Create(
         string city,
         string street,
         int house)
     {
         if (string.IsNullOrWhiteSpace(city))
-            return Errors.General.ValueIsEmptyOrWhiteSpace("city").ToFailure();
+            return Errors.General.ValueIsEmptyOrWhiteSpace("city");
 
         if (city.Length > MAX_LENGTH)
-            return Errors.General.ValueIsRequired("city").ToFailure();
+            return Errors.General.ValueIsRequired("city");
 
         if (string.IsNullOrWhiteSpace(street))
-            return Errors.General.ValueIsEmptyOrWhiteSpace("street").ToFailure();
+            return Errors.General.ValueIsEmptyOrWhiteSpace("street");
 
         if (street.Length > MAX_LENGTH)
-            return Errors.General.ValueIsRequired("street").ToFailure();
+            return Errors.General.ValueIsRequired("street");
 
         if (house <= 0)
-            return Errors.General.ValueMustBePositive("house").ToFailure();
+            return Errors.General.ValueMustBePositive("house");
 
         return new Address(
             city.Trim(),
             street.Trim(),
             house);
     }
-    public static Result<Address, Failure> CreateWithFlat(string city, string street, int house, int flat)
+    public static Result<Address, Error> CreateWithFlat(string city, string street, int house, int flat)
     {
         var addressResult = Create(city, street, house);
         if (addressResult.IsFailure)
             return addressResult;
 
         if (flat <= 0)
-            return Errors.General.ValueMustBePositive("flat").ToFailure();
+            return Errors.General.ValueMustBePositive("flat");
 
         return new Address(city.Trim(), street.Trim(), house, flat);
     }

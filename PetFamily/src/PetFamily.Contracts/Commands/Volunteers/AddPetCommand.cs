@@ -1,10 +1,8 @@
 using PetFamily.Contracts.Dtos;
 using PetFamily.Contracts.Dtos.FileProviderData;
-using PetFamily.Domain.PetManagment.ValueObjects;
 
-namespace PetFamily.Application.Volunteers.AddPet;
+namespace PetFamily.Contracts.Commands.Volunteers;
 
-/// Данные питомца из FrontEnd для его создания
 public record AddPetCommand(
     Guid VolunteerId,
     string PetName, 
@@ -16,7 +14,7 @@ public record AddPetCommand(
     double Weight,
     Guid SpeciesId,
     Guid BreedId,
-    IEnumerable<CreateFileDto> Files, //не будет передаваться должным образом ? 
+    IEnumerable<UploadFileDto> Files,  
     string Color,
     string PetStatus = "LookingTreatment");
 

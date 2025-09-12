@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using PetFamily.Application.Database;
-using PetFamily.Application.Providers;
+using PetFamily.Application.FileProvider;
 using PetFamily.Infrastructure.Options;
 using PetFamily.Infrastructure.Providers;
 using PetFamily.Infrastructure.Repositories;
@@ -15,6 +15,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(); 
         services.AddScoped<IVolunteersRepository, VolunteersRepository>();
+        services.AddScoped<ISpeciesRepository, SpeciesRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddMinio(configuration);
 
         return services;
@@ -22,6 +24,8 @@ public static class DependencyInjection
 
     private static IServiceCollection AddMinio(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<MinioOptions>(configuration.GetSection(MinioOptions.MINIO));
+
         services.AddMinio(options =>
         {
             var minioOptions = configuration.GetSection(MinioOptions.MINIO)
@@ -29,12 +33,9 @@ public static class DependencyInjection
 
             options.WithEndpoint(minioOptions.Endpoint);
             options.WithCredentials(minioOptions.AccessKey, minioOptions.SecretKey);
-            options.WithSSL(minioOptions.WithSSL);
+            options.WithSSL(minioOptions.WithSsl);
         });
-        services.AddSingleton<IMinioClient, MinioClient>();
         services.AddScoped<IFileProvider, MinioProvider>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        
 
         return services;
     }

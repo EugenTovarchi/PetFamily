@@ -56,6 +56,19 @@ public static class Errors
         {
             return Error.NotFound("entity.not.found", $"entity not found {field}");
         }
+
+        public static Error ValueIsEmpty(string? field = null)
+        {
+            return Error.Validation("value.is.empty", $" value {field} must be not empty");
+        }
+
+        public static Error ValueIsTooLarge(string field, int maxValue)
+        {
+            return Error.Validation(
+                "value.is.too.large",
+                $"value '{field}' is too large. Max value: {maxValue}",
+                invalidField: field);
+        }
     }
 
     public static class Volunteer

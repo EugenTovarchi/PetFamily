@@ -4,11 +4,11 @@ using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.Shared;
 
-namespace PetFamily.Application.Volunteers.CreateCommand;
+namespace PetFamily.Application.Volunteers.Create;
 
-public class CreateVolunteerCommandValidator : AbstractValidator<CreateVolunteerCommand>
+public class CreateVolunteerValidator : AbstractValidator<CreateVolunteerCommand>
 {
-    public CreateVolunteerCommandValidator()
+    public CreateVolunteerValidator()
     {
         RuleFor(c => c.VolunteerInfo)
          .NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("VolunteerInfo"))

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Minio;
 using PetFamily.API.Processors;
 using PetFamily.Application.Volunteers.AddPet;
 using PetFamily.Application.Volunteers.CreateVolunteer;
@@ -8,9 +9,9 @@ using PetFamily.Application.Volunteers.SoftDelete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
 using PetFamily.Application.Volunteers.UpdateRequisites;
 using PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
 using PetFamily.Contracts.Commands.Volunteer;
 using PetFamily.Contracts.Commands.Volunteers;
-using PetFamily.Contracts.Requests;
 using PetFamily.Contracts.Requests.Volunteers;
 using Shared;
 
@@ -43,15 +44,15 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPut("main-info/{id:guid}")]
+    [HttpPut("main-info/{volunteerId:guid}")]
     public async Task<IActionResult> Update(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromBody] UpdateMainInfoRequest request,
         [FromServices] UpdateMainInfoHandler handler,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateMainInfoCommand(id,request);
+        var command = new UpdateMainInfoCommand(volunteerId,request);
 
         var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
@@ -60,14 +61,14 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpDelete("soft/{id:guid}")]
+    [HttpDelete("soft/{volunteerId:guid}")]
     public async Task<IActionResult> SoftDelete(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromServices] SoftDeleteVolunteerHandler handler,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var command = new SoftDeleteVolunteerCommand(id);
+        var command = new SoftDeleteVolunteerCommand(volunteerId);
 
         var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
@@ -76,14 +77,14 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpDelete("hard/{id:guid}")]
+    [HttpDelete("hard/{volunteerId:guid}")]
     public async Task<IActionResult> HardDelete(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromServices] HardDeleteVolunteerHandler handler,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var command = new HardDeleteVolunteerCommand(id);
+        var command = new HardDeleteVolunteerCommand(volunteerId);
 
         var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
@@ -92,14 +93,14 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPut("restore/{id:guid}")]
+    [HttpPut("restore/{volunteerId:guid}")]
     public async Task<IActionResult> Restore(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromServices] RestoreDeletedVolunteerHandler handler,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var command = new RestoreVolunteerCommand(id);
+        var command = new RestoreVolunteerCommand(volunteerId);
 
         var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
@@ -108,15 +109,15 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPut("social-medias/{id:guid}")]
+    [HttpPut("{volunteerId:guid}/social-medias")]
     public async Task<IActionResult> UpdateSocialMedia(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromBody] UpdateSocialMediaRequest request,
         [FromServices] UpdateSocialMediasHandler handler,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateSocialMediaCommand(id, request);
+        var command = new UpdateSocialMediaCommand(volunteerId, request);
 
         var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
@@ -125,15 +126,15 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPut("requisites/{id:guid}")]
+    [HttpPut("{volunteerId:guid}/requisites")]
     public async Task<IActionResult> UpdateRequisites(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromBody] UpdateRequisitesRequest request,
         [FromServices] UpdateRequisitesHandler handler,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var command = new UpdateRequisitesCommand(id, request);
+        var command = new UpdateRequisitesCommand(volunteerId, request);
 
         var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
@@ -142,18 +143,15 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPost("pet/{id:guid}")]
+    [HttpPost("{volunteerId:guid}/pet")]
     public async Task<ActionResult> AddPet(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromForm] AddPetRequest request,
         [FromServices] AddPetHandler handler,
         CancellationToken cancellationToken)
     {
-        await using var fileProcessor = new FormFileProcessor();
-        var fileDtos = fileProcessor.Process(request.Files);
-
         var command = new AddPetCommand(
-            id,
+            volunteerId,
             request.PetName,
             request.Description,
             request.HealthInfo,
@@ -163,9 +161,30 @@ public class VolunteersController : ApplicationController
             request.Weight,
             request.SpeciesId,
             request.BreedId,
-            fileDtos,
+            [],
             request.Color,
             request.PetStatus);
+
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("{volunteerId:guid}/pet/{petId:guid}/photos")]
+    public async Task<ActionResult> UploadPhotos(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromForm] IFormFileCollection files,
+        [FromServices] UploadPetPhotosHandler handler,
+        CancellationToken cancellationToken)
+    {
+        await using var fileProcessor = new FormFileProcessor();
+        var fileDtos = fileProcessor.Process(files);
+
+        var command = new UploadPetPhotosCommand(volunteerId, petId, fileDtos);
 
         var result = await handler.Handle(command, cancellationToken);
 

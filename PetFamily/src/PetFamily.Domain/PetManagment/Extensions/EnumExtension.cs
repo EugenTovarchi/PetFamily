@@ -12,7 +12,7 @@ public static class EnumExtension
             "lookingtreatment" => PetStatus.LookingTreatment,
             "lookinghome" => PetStatus.LookingHome,
             "hashome" => PetStatus.HasHome,
-            _ => Errors.General.ValueIsInvalid(nameof(status)).ToFailure()
+            _ => Errors.General.ValueIsInvalid("petStatus").ToFailure()
         };
     }
 
@@ -32,8 +32,7 @@ public static class EnumExtension
             "полосатый" => PetColor.Striped,
             "смешанный" => PetColor.Mixed,
             "чёрно-белый" or "черно-белый" => PetColor.BlackAndWhite,
-
-            _ => Errors.General.ValueIsInvalid(nameof(color)).ToFailure()
+            _ => Errors.General.ValueIsInvalid("petColor").ToFailure()
         };
     }   
 }

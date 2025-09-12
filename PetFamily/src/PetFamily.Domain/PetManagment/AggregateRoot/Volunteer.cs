@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using PetFamily.Domain.Shared;
 using Shared;
 using Constants = Shared.Constants.Constants;
@@ -206,6 +207,15 @@ public class Volunteer : Shared.Entity<VolunteerId>, ISoftDeletable
 
         _volunteerSocialMedias.AddRange(socialMedias);
         return Result.Success<Error>();
+    }
+
+    public Result<Pet,Error> GetPetById(PetId petId)
+    {
+        var pet = _pets.FirstOrDefault(p => p.Id == petId);
+        if (pet == null)
+            return Errors.General.NotFound(petId.Value);
+
+        return pet;
     }
 
     public void Delete()

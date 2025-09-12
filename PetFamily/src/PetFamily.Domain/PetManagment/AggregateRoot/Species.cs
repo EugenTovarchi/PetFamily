@@ -2,6 +2,7 @@ using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.Entities;
 using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using Shared;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace PetFamily.Domain.PetManagment.AggregateRoot;
 
@@ -22,23 +23,16 @@ public  class Species : Shared.Entity<SpeciesId>
     private readonly List<Breed> _breeds = [];
     public IReadOnlyCollection<Breed> Breeds => _breeds.ToList();
 
-    public Result<Breed, Error> AddBreed(Breed breed)
+    public UnitResult<Error> AddBreed(Breed breed)
     {
         if (breed is null)
             return Errors.General.ValueIsInvalid("breed");
 
-        if (string.IsNullOrWhiteSpace(breed.Title))
-            return Errors.General.ValueIsEmptyOrWhiteSpace("breed");
+        if (_breeds.Contains(breed))
+            return Errors.General.Duplicate("breed");
 
-      
-        var breedId = BreedId.NewBreedId();
-        var breedResult = Breed.Create(breedId, breed.Title);
-
-        if (breedResult.IsFailure)
-            return breedResult.Error;
-
-        _breeds.Add(breedResult.Value);
-        return breedResult.Value;
+        _breeds.Add(breed);
+        return Result.Success<Error>();
     }
 
     public UnitResult<Error> RemoveBreed(Breed breed)
@@ -50,16 +44,7 @@ public  class Species : Shared.Entity<SpeciesId>
             return Errors.General.NotFoundValue("breed");
 
         _breeds.Remove(breed);
-        return CSharpFunctionalExtensions.Result.Success<Error>();
-    }
-
-    public Result<Breed, Error> EditBreed(Breed oldBreed, Breed newBreed)
-    {
-        var removeResult = RemoveBreed(oldBreed);
-        if (removeResult.IsFailure)
-            return removeResult.Error;
-
-        return AddBreed(newBreed);
+        return Result.Success<Error>();
     }
 
     public Result<Species, Error> UpdateTitle(string newTitle)

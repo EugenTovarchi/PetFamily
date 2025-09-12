@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
 using PetFamily.Application.FileProvider;
-using PetFamily.Application.Providers;
 using PetFamily.Domain.Shared;
 using Shared;
 
@@ -48,6 +47,8 @@ public class MinioProvider : IFileProvider
 
             //возвращаем список названий всех загруженных файлов
             var results = pathsResult.Select(p => p.Value).ToList();
+
+            _logger.LogInformation("Success uploading files: {files}", results.Select(f => f.Path.ToList()));
 
             return results;
         }

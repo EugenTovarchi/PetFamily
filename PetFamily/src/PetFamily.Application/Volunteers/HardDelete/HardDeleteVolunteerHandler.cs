@@ -10,14 +10,17 @@ namespace PetFamily.Application.Volunteers.HardDelete;
 public class HardDeleteVolunteerHandler
 {
     private readonly IVolunteersRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<HardDeleteVolunteerCommand> _validator;
     private readonly ILogger<HardDeleteVolunteerHandler> _logger;
     public HardDeleteVolunteerHandler(
         IVolunteersRepository repository,
+        IUnitOfWork unitOfWork,
         IValidator<HardDeleteVolunteerCommand> validator,
         ILogger<HardDeleteVolunteerHandler> logger)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
         _validator = validator;
         _logger = logger;
     }
@@ -49,7 +52,8 @@ public class HardDeleteVolunteerHandler
 
         var volunteer = volunteerResult.Value;
 
-        _repository.Delete(volunteer, cancellationToken); 
+        _repository.Delete(volunteer, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Волонтёр: {volunteerId} полностью удалён ", command.Id);
 

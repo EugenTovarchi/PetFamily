@@ -45,7 +45,7 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             address.Property(a => a.City).HasColumnName("city").IsRequired();
             address.Property(a => a.Street).HasColumnName("street").IsRequired();
             address.Property(a => a.House).HasColumnName("house").IsRequired();
-            address.Property(a => a.Flat).HasColumnName("flat").IsRequired();
+            address.Property(a => a.Flat).HasColumnName("flat");
         });
 
         builder.Property(p => p.Weight)

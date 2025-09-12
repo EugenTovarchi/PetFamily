@@ -16,11 +16,3 @@ public class UpdateRequsitesCommandValidator : AbstractValidator<UpdateRequisite
     }
 }
 
-//public class UpdateRequisiteDtoValidator : AbstractValidator<UpdateRequisitesRequest>
-//{
-//    public UpdateRequisiteDtoValidator()
-//    {
-//        RuleForEach(c => c.Dtos).MustBeValueObject(dto => Requisites.Create(dto.Title, dto.Instruction, dto.Value))
-//            .When(c => c != null);
-//    }
-//}

@@ -43,8 +43,9 @@ public  class AddBreedHandler
             return validationResult.ToErrors();
         }
 
+        var speciesId = SpeciesId.Create(command.SpeciesId).Value;
         var speciesResult = await _speciesRepository.GetById(
-               command.SpeciesId,
+               speciesId,
                 cancellationToken);
 
         if (!speciesResult.IsSuccess)
@@ -54,7 +55,6 @@ public  class AddBreedHandler
             return Errors.General.NotFoundEntity("species").ToFailure();
         }
 
-        var speciesId = SpeciesId.Create(command.SpeciesId).Value;
         var species = speciesResult.Value;
 
         var breedExists = await _speciesRepository.BreedExistsInSpecies(

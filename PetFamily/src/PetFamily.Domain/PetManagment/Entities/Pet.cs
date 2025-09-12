@@ -23,7 +23,7 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
         double weight,
         PetType petType,
         DateTime createdAt,
-        ValueObjectList<PetPhoto> photos, 
+        ValueObjectList<PetPhoto>? photos, 
         PetColor color ,
         PetStatus petStatus = PetStatus.LookingTreatment,
         IReadOnlyCollection<Requisites>? requisites = null
@@ -36,7 +36,7 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
         Weight = weight;
         Height = height;
         Vaccinated = vaccinated;
-        Photos = photos;
+        Photos = photos ?? new ValueObjectList<PetPhoto>([]);
         PetStatus = petStatus;
         PetType = petType;
         CreatedAt = DateTime.UtcNow;
@@ -137,6 +137,6 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
         _isDeleted = false;
     }
 
-    public void UpdateFilesList(ValueObjectList<PetPhoto> photos) =>
+    public void UpdatePhotos(ValueObjectList<PetPhoto> photos) =>
         Photos = photos;
 }

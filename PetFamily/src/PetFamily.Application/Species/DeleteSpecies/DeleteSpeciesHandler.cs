@@ -3,23 +3,22 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Contracts.Commands.Species;
-using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using Shared;
 
-namespace PetFamily.Application.Species.DeleteBreed;
+namespace PetFamily.Application.Species.DeleteSpecies;
 
-public class DeleteBreedHandler
+public class DeleteSpeciesHandler
 {
     private readonly ISpeciesRepository _speciesRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IValidator<DeleteBreedCommand> _validator;
-    private readonly ILogger<DeleteBreedHandler> _logger;
+    private readonly IValidator<DeleteSpeciesCommand> _validator;
+    private readonly ILogger<DeleteSpeciesHandler> _logger;
 
-    public DeleteBreedHandler(
+    public DeleteSpeciesHandler(
         ISpeciesRepository speciesRepository,
         IUnitOfWork unitOfWork,
-        IValidator<DeleteBreedCommand> validator,
-        ILogger<DeleteBreedHandler> logger)
+        IValidator<DeleteSpeciesCommand> validator,
+        ILogger<DeleteSpeciesHandler> logger)
     {
         _speciesRepository = speciesRepository;
         _unitOfWork = unitOfWork;
@@ -27,8 +26,8 @@ public class DeleteBreedHandler
         _logger = logger;
     }
 
-    public async Task<Result<Guid,Failure>>Handle(
-        DeleteBreedCommand command,
+    public async Task<Result<Guid, Failure>> Handle(
+        DeleteSpeciesCommand command,
         CancellationToken cancellationToken = default)
     {
         if (command == null)
@@ -51,22 +50,12 @@ public class DeleteBreedHandler
         }
 
         var species = speciesResult.Value;
-        var breed = species.Breeds.FirstOrDefault(b => b.Id.Value == command.BreedId);
-        if (breed is null)
-        {
-            _logger.LogWarning("Порода {command.BreedId} не существует в виде {command.SpeciesId}!",
-                command.BreedId, command.SpeciesId);
-            return Errors.General.NotFoundEntity("breed").ToFailure();
-        }
 
-        var removeResult = species.RemoveBreed(breed);
-        if (removeResult.IsFailure)
-            return removeResult.Error.ToFailure();
-
-        _logger.LogInformation("Порода: {command.BreedId}  удалёна", command.BreedId);
-
+        _speciesRepository.Delete(species, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return breed.Id.Value;
+        _logger.LogInformation("Вид: {command.SpeciesId}  удалён ", command.SpeciesId);
+
+        return species.Id.Value;
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using PetFamily.Application.Database;
 using PetFamily.Domain.PetManagment.AggregateRoot;
 using PetFamily.Domain.PetManagment.Entities;
-using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using Shared;
 
 namespace PetFamily.Infrastructure.Repositories;
@@ -16,24 +15,25 @@ public class SpeciesRepository : ISpeciesRepository
     {
         _dbContext = dbContext;
     }
-    //public async Task<Guid> Add(Volunteer volunteer, CancellationToken cancellationToken)
-    //{
-    //    await _dbContext.Volunteers.AddAsync(volunteer, cancellationToken);
-    //    await _dbContext.SaveChangesAsync();
-    //    return volunteer.Id;
-    //}
 
-    //public Guid Delete(Volunteer volunteer, CancellationToken cancellationToken = default)
-    //{
-    //    _dbContext.Volunteers.Remove(volunteer);
-    //    return volunteer.Id;
-    //}
+    public async Task<Guid> Add(Species species, CancellationToken cancellationToken)
+    {
+        await _dbContext.Species.AddAsync(species, cancellationToken);
+        await _dbContext.SaveChangesAsync();
+        return species.Id;
+    }
+
+    public Guid Delete(Species species, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Species.Remove(species);
+        return species.Id;
+    }
 
     public async Task<Result<Species, Error>> GetById(Guid speciesId, CancellationToken cancellationToken)
     {
         var species = await _dbContext.Species
-            .Include(v => v.Breeds)
-            .FirstOrDefaultAsync(v => v.Id == speciesId, cancellationToken);
+            .Include(s => s.Breeds)
+            .FirstOrDefaultAsync(s => s.Id == speciesId, cancellationToken);
 
         if (species is null)
             return Errors.General.NotFoundEntity("species");
@@ -41,31 +41,28 @@ public class SpeciesRepository : ISpeciesRepository
         return species;
     }
 
-    //public async Task<Result<Volunteer, Error>> GetByName(string firstName, string lastName, string? middleName, CancellationToken cancellationToken)
-    //{
-    //    var volunteer = await _dbContext.Volunteers
-    //        .Include(v => v.Pets)
-    //        .FirstOrDefaultAsync(v =>
-    //                v.VolunteerFullName.FirstName == firstName &&
-    //                v.VolunteerFullName.LastName == lastName &&
-    //                (middleName == null || v.VolunteerFullName.MiddleName == middleName),
-    //                cancellationToken);
+    public async Task<Result<Species, Error>> GetByTitle(string title, CancellationToken cancellationToken)
+    {
+        var species = await _dbContext.Species
+            .FirstOrDefaultAsync(s =>
+                    s.Title == title, cancellationToken);
 
-    //    if (volunteer is null)
-    //        return Errors.General.ValueIsInvalid("volunteer");
+        if (species is null)
+            return Errors.General.NotFoundEntity("species");
 
-    //    return volunteer;
-    //}
+        return species;
+    }
 
     public async Task<Result<Breed, Error>> GetBreedByBreedId(Guid breedId, CancellationToken cancellationToken)
     {
         var breed = await _dbContext.Species
+            //.AsNoTracking()   //выскакивает ошибка при добавлении пета
         .SelectMany(s => s.Breeds)
-        .FirstOrDefaultAsync(b => b.Id == BreedId.Create(breedId),
+        .FirstOrDefaultAsync(b => b.Id == breedId,
         cancellationToken);
 
         if (breed is null)
-            return Errors.General.ValueIsInvalid("breed");
+            return Errors.General.NotFoundEntity("breed");
 
         return breed;
     }
@@ -73,7 +70,8 @@ public class SpeciesRepository : ISpeciesRepository
     public async Task<bool> BreedExistsInSpecies(Guid speciesId, string breedTitle, CancellationToken ct)
     {
         return await _dbContext.Species
-            .Where(s => s.Id == SpeciesId.Create(speciesId))
+            .AsNoTracking()
+            .Where(s => s.Id == speciesId)
             .AnyAsync(s => s.Breeds.Any(b =>
                 b.Title.ToLower() == breedTitle.ToLower()), ct);
     }

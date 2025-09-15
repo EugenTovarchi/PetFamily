@@ -6,17 +6,19 @@ public record Error
     public string Code { get; }
     public string Message { get; }
     public ErrorType? Type { get; }
+    public string? InvalidField { get; }
 
-    private Error(string code, string message, ErrorType? type)
+    private Error(string code, string message, ErrorType? type, string? invalidField = null)
     {
         Code = code;
         Message = message;
         Type = type;
+        InvalidField = invalidField;
     }
 
     public static Error None = new(string.Empty, string.Empty, ErrorType.None);
 
-    public static Error Validation(string code, string message) =>
+    public static Error Validation(string code, string message, string? invalidField = null) =>
         new(code ?? "value.is.invalid", message, ErrorType.Validation);
     public static Error NotFound(string code, string message) =>
         new(code ?? "record.not.found", message, ErrorType.NotFound);

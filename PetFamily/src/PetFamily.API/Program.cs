@@ -1,5 +1,6 @@
 using Microsoft.OpenApi.Models;
 using PetFamily.API.Middlewares;
+using PetFamily.Application;
 using PetFamily.Infrastructure;
 using Serilog;
 using Serilog.Events;
@@ -40,7 +41,7 @@ public class Program
 
         builder.Services
             .AddApplication()
-            .AddInfrastructure();
+            .AddInfrastructure(builder.Configuration); //для Minio добавили Configuration
 
         var app = builder.Build();
 

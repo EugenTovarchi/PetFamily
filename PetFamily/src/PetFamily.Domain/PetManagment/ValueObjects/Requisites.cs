@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Shared;
 
 namespace PetFamily.Domain.PetManagment.ValueObjects;
@@ -7,7 +8,7 @@ public sealed record Requisites(
     string Instruction,
     decimal Value)
 {
-    public static Result<Requisites> Create(string title, string instruction, decimal value)
+    public static Result<Requisites,Error> Create(string title, string instruction, decimal value)
     {
         if (string.IsNullOrWhiteSpace(title))
             return Errors.General.ValueIsEmptyOrWhiteSpace("title");

@@ -1,4 +1,6 @@
+using CSharpFunctionalExtensions;
 using Shared;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace PetFamily.Contracts.Dtos;
 
@@ -7,15 +9,15 @@ public  record RequisitesDto(
     string Instruction,
     decimal Value)
 {
-    public Result Validate()
+    public UnitResult<Error> Validate()
     {
         if (string.IsNullOrWhiteSpace(Title))
-            return Errors.General.ValueIsEmptyOrWhiteSpace(nameof(Title));
+            return Errors.General.ValueIsEmptyOrWhiteSpace("Title");
 
         if (Value < 0)
-            return Errors.General.ValueIsInvalid(nameof(Value));
+            return Errors.General.ValueIsInvalid("Value");
 
-        return Result.Success();
+        return Result.Success<Error>();
     }
 }
 

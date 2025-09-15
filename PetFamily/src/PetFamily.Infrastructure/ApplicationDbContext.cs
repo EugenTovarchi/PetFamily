@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using PetFamily.Domain.PetManagment.AggregateRoot;
-using PetFamily.Infrastructure.Interceptors;
 
 namespace PetFamily.Infrastructure;
 
@@ -10,7 +9,9 @@ public class ApplicationDbContext(IConfiguration configuration) : DbContext
 {
     private readonly IConfiguration _configuration = configuration;
 
-    public DbSet<Volunteer> Volunteers { get; set; }
+    public DbSet<Volunteer> Volunteers => Set<Volunteer>();
+    public DbSet<Species> Species => Set<Species>();
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

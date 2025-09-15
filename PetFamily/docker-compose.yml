@@ -13,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgresUser"]
+      test: ["CMD-SHELL", "pg_isready -U PetFamily"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -30,6 +30,8 @@ services:
       condition: service_healthy
      seq:
       condition: service_started
+     minio:
+        condition: service_started
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=PetFamily;Username=postgresUser;Password=postgresPassword
@@ -43,15 +45,33 @@ services:
     restart: unless-stopped 
     environment: 
     - ACCEPT_EULA=Y
-    - SEQ_FIRSTRUN_ADMINPASSWORD=admin123
+    - SEQ_FIRSTRUN_ADMINPASSWORD=admin1234
     ports:
     - 5341:5341
     - 8081:80  
     volumes:
     - seq_data:/data
+   
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: unless-stopped
+    ports:
+    - 9000:9000
+    - 9001:9001
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+    - minio_data:/data
+    command: server /data --console-address ":9001"
+   
+
+
 
   
 
 volumes:
   postgres_data:
   seq_data:  
+  minio_data:  

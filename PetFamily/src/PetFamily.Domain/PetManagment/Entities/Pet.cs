@@ -1,11 +1,14 @@
+using CSharpFunctionalExtensions;
 using PetFamily.Domain.PetManagment.ValueObjects;
+using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using PetFamily.Domain.Shared;
+using PetFamily.Domain.Shared.ValueObjects;
 using Shared;
-using System.Collections.Immutable;
+using Result = CSharpFunctionalExtensions.Result;
 
 namespace PetFamily.Domain.PetManagment.Entities;
 
-public class Pet : Entity<PetId>, ISoftDeletable
+public class Pet : Shared.Entity<PetId>, ISoftDeletable
 {
     private Pet(PetId id) : base(id) { }
 
@@ -13,32 +16,31 @@ public class Pet : Entity<PetId>, ISoftDeletable
         PetId petId,
         string name,
         string description,
-        PetColor color,
         string healthInfo,
-        PetAddress petAddress,
-        Phone ownerPhone,
+        Address petAddress,
         bool vaccinated,
         double height,
         double weight,
         PetType petType,
         DateTime createdAt,
+        ValueObjectList<PetPhoto>? photos, 
+        PetColor color ,
         PetStatus petStatus = PetStatus.LookingTreatment,
         IReadOnlyCollection<Requisites>? requisites = null
         ) : base(petId)
     {
         Name = name;
-        Color = color;
-        OwnerPhone = ownerPhone;
         Description = description ?? string.Empty;
         HealthInfo = healthInfo;
         PetAddress = petAddress;
         Weight = weight;
         Height = height;
         Vaccinated = vaccinated;
+        Photos = photos ?? new ValueObjectList<PetPhoto>([]);
         PetStatus = petStatus;
         PetType = petType;
-        CreatedAt = createdAt;
         CreatedAt = DateTime.UtcNow;
+        Color = color;
     }
 
     private bool _isDeleted = false;
@@ -47,21 +49,23 @@ public class Pet : Entity<PetId>, ISoftDeletable
     private DateTime? _deletionDate;
     public DateTime? DeletionDate => _deletionDate;
 
+    public ValueObjectList<PetPhoto>? Photos { get; private set; } 
+
     public string Name { get; private set; } = string.Empty;
 
     public string Description { get; private set; } = string.Empty;
 
-    public PetColor Color;
+    public PetColor Color { get; private set; }
 
     public string HealthInfo { get; private set; } = string.Empty;
 
-    public PetAddress PetAddress { get; private set; } = null!;
+    public Address PetAddress { get; private set; } = null!;
 
     public double? Weight { get; private set; }
 
     public double? Height { get; private set; }
 
-    public Phone OwnerPhone { get; private set; } = null!;
+    public Phone? OwnerPhone { get; private set; } 
 
     public bool? Castrated { get; private set; }
 
@@ -80,7 +84,7 @@ public class Pet : Entity<PetId>, ISoftDeletable
 
     public IReadOnlyCollection<Requisites> PetRequisites => _petRequisites.ToList();
 
-    public Result<Requisites> AddRequisites(Requisites requisite)
+    public UnitResult<Error> AddRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -89,10 +93,10 @@ public class Pet : Entity<PetId>, ISoftDeletable
             return Errors.General.ValueIsEmptyOrWhiteSpace("Title");
 
         _petRequisites.Add(requisite);
-        return requisite;
+        return Result.Success<Error>();
     }
 
-    public Result RemoveRequisites(Requisites requisite)
+    public UnitResult<Error> RemoveRequisites(Requisites requisite)
     {
         if (requisite is null)
             return Errors.General.ValueIsInvalid("requisite");
@@ -101,16 +105,18 @@ public class Pet : Entity<PetId>, ISoftDeletable
             return Errors.General.NotFoundValue("requisite.Title");
 
         _petRequisites.Remove(requisite);
-        return Result.Success();
+        return Result.Success<Error>();
     }
 
-    public Result UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
+    public UnitResult<Error> UpdateRequisites(Requisites oldRequisite, Requisites newRequisite)
     {
         var removeResult = RemoveRequisites(oldRequisite);
         if (removeResult.IsFailure)
-            return removeResult;
+            return removeResult.Error;
 
-        return AddRequisites(newRequisite);
+        AddRequisites(newRequisite);
+
+        return Result.Success<Error>();
     }
 
     public void Delete()
@@ -129,5 +135,25 @@ public class Pet : Entity<PetId>, ISoftDeletable
             return;
 
         _isDeleted = false;
+    }
+
+    public void UpdatePhotos(ValueObjectList<PetPhoto> photos) =>
+        Photos = photos;
+
+    public UnitResult<Error> RemovePhotos(IEnumerable<string> deletedPaths)
+    {
+        if (deletedPaths is null || !deletedPaths.Any())
+            return Errors.General.ValueIsEmptyOrWhiteSpace(nameof(deletedPaths));
+
+        if (Photos is null || !Photos.Any())
+            return Result.Success<Error>(); 
+
+        var remainingPhotos = Photos
+            .Where(photo => !deletedPaths.Contains(photo.PathToStorage.Path))
+            .ToList();
+
+        Photos = new ValueObjectList<PetPhoto>(remainingPhotos);
+
+        return Result.Success<Error>();
     }
 }

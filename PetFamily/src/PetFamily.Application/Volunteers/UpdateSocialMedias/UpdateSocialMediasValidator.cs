@@ -1,23 +1,17 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
-using PetFamily.Contracts.Dtos;
+using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.ValueObjects;
-using Shared;
 
-namespace PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
+namespace PetFamily.Application.Volunteers.UpdateSocialMedias;
 
-public class UpdateSocialMediasRequestValidator : AbstractValidator<UpdateSocialMediaRequest>
+public class UpdateSocialMediasCommandValidator : AbstractValidator<UpdateSocialMediaCommand>
 {
-    public UpdateSocialMediasRequestValidator()
+    public UpdateSocialMediasCommandValidator()
     {
         RuleFor(u => u.Id).NotEmpty().WithError(Errors.General.ValueIsEmptyOrWhiteSpace("VolunteerId"));
-    }
-}
-public  class UpdateSocialMediasDtoValidator : AbstractValidator<UpdateSocialMediaDto>
-{
-    public UpdateSocialMediasDtoValidator()
-    {
-        RuleForEach(c => c.Dtos).MustBeValueObject(dto => VolunteerSocialMedia.Create(dto.Title, dto.Url))
+        RuleForEach(c => c.SocialMedias.Dtos).MustBeValueObject(dto => VolunteerSocialMedia.Create(dto.Title, dto.Url))
             .When(c => c != null);
     }
 }
+

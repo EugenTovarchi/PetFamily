@@ -1,15 +1,18 @@
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using PetFamily.Application.Volunteers.CreateVolunteer;
-using PetFamily.Application.Volunteers.DeleteCommand;
+using PetFamily.API.Processors;
+using PetFamily.Application.Volunteers.AddPet;
+using PetFamily.Application.Volunteers.Create;
+using PetFamily.Application.Volunteers.DeletePetPhotos;
+using PetFamily.Application.Volunteers.GetPetPhotos;
 using PetFamily.Application.Volunteers.HardDelete;
 using PetFamily.Application.Volunteers.Restore;
 using PetFamily.Application.Volunteers.SoftDelete;
-using PetFamily.Application.Volunteers.UpdateMainInfoCommand;
-using PetFamily.Application.Volunteers.UpdateRequisitesCommand;
-using PetFamily.Application.Volunteers.UpdateSocialMediasCommand;
-using PetFamily.Contracts.Dtos;
-using PetFamily.Contracts.Requests;
+using PetFamily.Application.Volunteers.UpdateMainInfo;
+using PetFamily.Application.Volunteers.UpdateRequisites;
+using PetFamily.Application.Volunteers.UpdateSocialMedias;
+using PetFamily.Application.Volunteers.UploadPetPhotos;
+using PetFamily.Contracts.Commands.Volunteers;
+using PetFamily.Contracts.Requests.Volunteers;
 using Shared;
 
 namespace PetFamily.API.Controllers;
@@ -20,24 +23,20 @@ public class VolunteersController : ApplicationController
     [HttpPost]
     public async Task<IActionResult> Create(
         [FromServices] CreateVolunteerHandler handler,
-        [FromServices] IValidator<CreateVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         [FromBody] CreateVolunteerRequest request,
         CancellationToken cancellationToken)
     {
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+        var command = new CreateVolunteerCommand(
+            request.FullName,
+            request.Phone,
+            request.Email,
+            request.VolunteerInfo,
+            request.ExperienceYears,
+            request.VolunteerSocialMediaDtos,
+            request.RequisitesDtos);
 
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.FullName.FirstName}" +
-                "  {request.FullName.LastName} не валиден!",
-                request.FullName.FirstName,
-                request.FullName.LastName);
-
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken); 
 
         if (result.IsFailure)
             return result.Error.ToResponse();
@@ -45,147 +44,186 @@ public class VolunteersController : ApplicationController
         return Ok(result.Value);
     }
 
-    [HttpPut("main-info/{id:guid}")]
+    [HttpPut("main-info/{volunteerId:guid}")]
     public async Task<IActionResult> Update(
-        [FromRoute] Guid id,
-        [FromBody] UpdateMainInfoDto dto,
+        [FromRoute] Guid volunteerId,
+        [FromBody] UpdateMainInfoRequest request,
         [FromServices] UpdateMainInfoHandler handler,
-        [FromServices] IValidator<UpdateMainInfoRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new UpdateMainInfoRequest(id, dto);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.Id} не валиден!", request.Id);
+        var command = new UpdateMainInfoCommand(volunteerId,request);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
         return Ok(result.Value);
     }
 
-    [HttpDelete("soft/{id:guid}")]
+    [HttpDelete("soft/{volunteerId:guid}")]
     public async Task<IActionResult> SoftDelete(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromServices] SoftDeleteVolunteerHandler handler,
-        [FromServices] IValidator<DeleteVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new DeleteVolunteerRequest(id);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.Id} не валиден!", request.Id);
+        var command = new SoftDeleteVolunteerCommand(volunteerId);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
         return Ok(result.Value);
     }
 
-    [HttpDelete("hard/{id:guid}")]
+    [HttpDelete("hard/{volunteerId:guid}")]
     public async Task<IActionResult> HardDelete(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromServices] HardDeleteVolunteerHandler handler,
-        [FromServices] IValidator<DeleteVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new DeleteVolunteerRequest(id);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Волонтёр {request.Id} не валиден!", request.Id);
+        var command = new HardDeleteVolunteerCommand(volunteerId);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
         return Ok(result.Value);
     }
 
-    [HttpPut("restore/{id:guid}")]
+    [HttpPut("restore/{volunteerId:guid}")]
     public async Task<IActionResult> Restore(
-        [FromRoute] Guid id,
+        [FromRoute] Guid volunteerId,
         [FromServices] RestoreDeletedVolunteerHandler handler,
-        [FromServices] IValidator<RestoreVolunteerRequest> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new RestoreVolunteerRequest(id);
-        var validationResult = await _validator.ValidateAsync(request, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Id волонтёра {request.Id} не валидно!", request.Id);
+        var command = new RestoreVolunteerCommand(volunteerId);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
         return Ok(result.Value);
     }
 
-    [HttpPut("social-medias/{id:guid}")]
+    [HttpPut("{volunteerId:guid}/social-medias")]
     public async Task<IActionResult> UpdateSocialMedia(
-        [FromRoute] Guid id,
-        [FromBody] UpdateSocialMediaDto dto,
+        [FromRoute] Guid volunteerId,
+        [FromBody] UpdateSocialMediaRequest request,
         [FromServices] UpdateSocialMediasHandler handler,
-        [FromServices] IValidator<UpdateSocialMediaDto> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new UpdateSocialMediaRequest(id, dto);
-        var validationResult = await _validator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Социальные сети {request.Id} не валидны!", request.Id);
+        var command = new UpdateSocialMediaCommand(volunteerId, request);
 
-            return validationResult.ToValidationErrorResponse();
-        }
-
-        var result = await handler.Handle(request, cancellationToken);
+        var result = await handler.Handle(command, cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 
         return Ok(result.Value);
     }
 
-    [HttpPut("requisites/{id:guid}")]
+    [HttpPut("{volunteerId:guid}/requisites")]
     public async Task<IActionResult> UpdateRequisites(
-        [FromRoute] Guid id,
-        [FromBody] UpdateRequisitesDto dto,
+        [FromRoute] Guid volunteerId,
+        [FromBody] UpdateRequisitesRequest request,
         [FromServices] UpdateRequisitesHandler handler,
-        [FromServices] IValidator<UpdateRequisitesDto> _validator,
         [FromServices] ILogger<VolunteersController> _logger,
         CancellationToken cancellationToken)
     {
-        var request = new UpdateRequisitesRequest(id, dto);
-        var validationResult = await _validator.ValidateAsync(dto, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            _logger.LogWarning("Реквизиты {request.Id} не валидны!", request.Id);
+        var command = new UpdateRequisitesCommand(volunteerId, request);
 
-            return validationResult.ToValidationErrorResponse();
-        }
+        var result = await handler.Handle(command, cancellationToken);
+        if (result.IsFailure)
+            return result.Error.ToResponse();
 
-        var result = await handler.Handle(request, cancellationToken);
+        return Ok(result.Value);
+    }
+
+    [HttpPost("{volunteerId:guid}/pet")]
+    public async Task<ActionResult> AddPet(
+        [FromRoute] Guid volunteerId,
+        [FromForm] AddPetRequest request,
+        [FromServices] AddPetHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new AddPetCommand(
+            volunteerId,
+            request.PetName,
+            request.Description,
+            request.HealthInfo,
+            request.Address, 
+            request.Vaccinated,
+            request.Height,
+            request.Weight,
+            request.SpeciesId,
+            request.BreedId,
+            [],
+            request.Color,
+            request.PetStatus);
+
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("{volunteerId:guid}/pet/{petId:guid}/photos")]
+    public async Task<ActionResult> UploadPhotos(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromForm] IFormFileCollection files,
+        [FromServices] UploadPetPhotosHandler handler,
+        CancellationToken cancellationToken)
+    {
+        await using var fileProcessor = new FormFileProcessor();
+        var fileDtos = fileProcessor.Process(files);
+
+        var command = new UploadPetPhotosCommand(volunteerId, petId, fileDtos);
+
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpDelete("{volunteerId:guid}/pet/{petId:guid}/pet-photos")]
+    public async Task<ActionResult> DeletePhotos(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] DeletePetPhotosRequest request,
+        [FromServices] DeletePetPhotosHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeletePetPhotosCommand(volunteerId, petId, request);
+
+        var result = await handler.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPost("{volunteerId:guid}/pet/{petId:guid}/pet-photos")]
+    public async Task<ActionResult> GetPhotos(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] GetPetPhotosRequest request,
+        [FromServices] GetPetPhotosHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new GetPetPhotosCommand(volunteerId, petId, request);
+
+        var result = await handler.Handle(command, cancellationToken);
+
         if (result.IsFailure)
             return result.Error.ToResponse();
 

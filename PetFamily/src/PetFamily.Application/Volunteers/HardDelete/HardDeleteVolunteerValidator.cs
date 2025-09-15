@@ -1,11 +1,10 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
-using PetFamily.Application.Volunteers.DeleteCommand;
-using Shared;
+using PetFamily.Contracts.Commands.Volunteers;
 
 namespace PetFamily.Application.Volunteers.HardDelete;
 
-public class HardDeleteVolunteerValidation : AbstractValidator<DeleteVolunteerRequest>
+public class HardDeleteVolunteerValidation : AbstractValidator<HardDeleteVolunteerCommand>
 {
     public HardDeleteVolunteerValidation()
     {

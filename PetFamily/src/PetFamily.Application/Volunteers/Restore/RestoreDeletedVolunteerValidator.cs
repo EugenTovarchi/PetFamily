@@ -1,11 +1,10 @@
 using FluentValidation;
 using PetFamily.Application.Validation;
-using PetFamily.Contracts.Requests;
-using Shared;
+using PetFamily.Contracts.Commands.Volunteers;
 
 namespace PetFamily.Application.Volunteers.Restore;
 
-public class RestoreDeletedVolunteerValidator : AbstractValidator<RestoreVolunteerRequest>
+public class RestoreDeletedVolunteerValidator : AbstractValidator<RestoreVolunteerCommand>
 {
     public RestoreDeletedVolunteerValidator()
     {

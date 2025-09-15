@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Shared;
 using Shared.Constants;
 
@@ -16,7 +17,7 @@ public record FullName
         MiddleName = middleName?.Trim();
     }
 
-    public static Result<FullName> Create(string firstName, string lastName)
+    public static Result<FullName,Error> Create(string firstName, string lastName)
     {
         if (string.IsNullOrWhiteSpace(firstName) || firstName.Length > Constants.MAX_NAMES_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("firstName");
@@ -27,7 +28,7 @@ public record FullName
         return new FullName(firstName, lastName);
     }
 
-    public static Result<FullName> CreateWithMiddle(string firstName, string lastName, string middleName)
+    public static Result<FullName, Error> CreateWithMiddle(string firstName, string lastName, string middleName)
     {
         if (string.IsNullOrWhiteSpace(firstName) || firstName.Length > Constants.MAX_NAMES_LENGTH)
             return Errors.General.ValueIsEmptyOrWhiteSpace("firstName");

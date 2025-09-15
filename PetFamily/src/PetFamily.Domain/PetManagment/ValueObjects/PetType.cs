@@ -1,3 +1,4 @@
+using CSharpFunctionalExtensions;
 using Shared;
 
 namespace PetFamily.Domain.PetManagment.ValueObjects;
@@ -13,7 +14,7 @@ public record PetType
         BreedId = breedId;
     }
 
-    public static Result<PetType> Create(Guid speciesId, Guid breedId)
+    public static Result<PetType,Error> Create(Guid speciesId, Guid breedId)
     {
         if (speciesId == Guid.Empty)
             return Errors.General.EmptyId(speciesId);

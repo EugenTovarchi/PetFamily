@@ -5,6 +5,7 @@ using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.DeletePetPhotos;
 using PetFamily.Application.Volunteers.GetPetPhotos;
 using PetFamily.Application.Volunteers.HardDelete;
+using PetFamily.Application.Volunteers.MovePetPosition;
 using PetFamily.Application.Volunteers.Restore;
 using PetFamily.Application.Volunteers.SoftDelete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
@@ -224,6 +225,23 @@ public class VolunteersController : ApplicationController
 
         var result = await handler.Handle(command, cancellationToken);
 
+        if (result.IsFailure)
+            return result.Error.ToResponse();
+
+        return Ok(result.Value);
+    }
+
+    [HttpPut("{volunteerId:guid}/pet/{petId:guid}/pet-position")]
+    public async Task<ActionResult> MovePosition(
+        [FromRoute] Guid volunteerId,
+        [FromRoute] Guid petId,
+        [FromBody] MovePetPositionRequest request,
+        [FromServices] MovePetPositionHandler handler,
+        CancellationToken cancellationToken)
+    {
+        var command = new MovePetPositionCommand(volunteerId, petId, request);
+
+        var result = await handler.Handle(command,cancellationToken);
         if (result.IsFailure)
             return result.Error.ToResponse();
 

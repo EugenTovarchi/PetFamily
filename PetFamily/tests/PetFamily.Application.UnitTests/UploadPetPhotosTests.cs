@@ -43,7 +43,7 @@ public class UploadPetPhotosTests
         var unitOfWorkMock = new Mock<IUnitOfWork>();
         unitOfWorkMock.Setup(u => u.SaveChangesAsync(ct)).Returns(Task.CompletedTask);
 
-        var logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<UploadPetPhotosHandler>();
+        var loggerMock = new Mock<ILogger<UploadPetPhotosHandler>>();
 
         //данные на возврат смотрим в методе IFileProvider
         var fileProviderMock = new Mock<IFileProvider>();   
@@ -58,7 +58,7 @@ public class UploadPetPhotosTests
             volunteerRepositoryMock.Object,
             unitOfWorkMock.Object,
             fluentValidatorMock.Object,
-            logger);
+            loggerMock.Object);
 
         //act
         var result = await handler.Handle(command, ct);

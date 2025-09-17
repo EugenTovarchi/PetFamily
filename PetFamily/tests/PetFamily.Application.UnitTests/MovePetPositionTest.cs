@@ -17,9 +17,21 @@ namespace PetFamily.Application.UnitTests;
 
 public  class MovePetPositionTest
 {
+    private readonly Mock<IVolunteersRepository> _volunteerRepositoryMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+    private readonly Mock<IValidator<MovePetPositionCommand>> _validatorMock;
+    private readonly Mock<ILogger<MovePetPositionHandler>> _loggerMock;
+    public MovePetPositionTest()
+    {
+        _volunteerRepositoryMock =  new Mock<IVolunteersRepository>(); 
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
+        _validatorMock = new Mock<IValidator<MovePetPositionCommand>>();
+        _loggerMock = new Mock<ILogger<MovePetPositionHandler>>();
+    }
     [Fact]
     public async Task Handle_Should_Move_PetPosition()
     {
+
         const int petsCount = 5;
         const int POSITION_NUMBER = 3;
 
@@ -43,23 +55,17 @@ public  class MovePetPositionTest
         MovePetPositionRequest request = new (POSITION_NUMBER);
         MovePetPositionCommand command = new(volunteer.Id, fifthPet.Id, request);
 
-        var volunteerRepositoryMock = new Mock<IVolunteersRepository>();
-        volunteerRepositoryMock.Setup(r => r.GetById(volunteer.Id, ct)).ReturnsAsync(volunteer);
+        _volunteerRepositoryMock.Setup(r => r.GetById(volunteer.Id, ct)).ReturnsAsync(volunteer);
 
-        var unitOfWorkMock = new Mock<IUnitOfWork>();
-        unitOfWorkMock.Setup(u => u.SaveChangesAsync(ct)).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(u => u.SaveChangesAsync(ct)).Returns(Task.CompletedTask);
 
-        var logger = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<MovePetPositionHandler>();
-
-        //вкладываем положительный результат валидации
-        var fluentValidatorMock = new Mock<IValidator<MovePetPositionCommand>>();
-        fluentValidatorMock.Setup(v => v.ValidateAsync(command, ct)).ReturnsAsync(new FluentValidation.Results.ValidationResult());
+        _validatorMock.Setup(v => v.ValidateAsync(command, ct)).ReturnsAsync(new FluentValidation.Results.ValidationResult());
 
         var handler = new MovePetPositionHandler(
-            volunteerRepositoryMock.Object,
-            unitOfWorkMock.Object,
-            fluentValidatorMock.Object,
-            logger);
+            _volunteerRepositoryMock.Object,
+            _unitOfWorkMock.Object,
+            _validatorMock.Object,
+            _loggerMock.Object);
 
         //act
         var result = await handler.Handle(command, ct);

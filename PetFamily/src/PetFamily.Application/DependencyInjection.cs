@@ -9,6 +9,7 @@ using PetFamily.Application.Volunteers.Create;
 using PetFamily.Application.Volunteers.DeletePetPhotos;
 using PetFamily.Application.Volunteers.GetPetPhotos;
 using PetFamily.Application.Volunteers.HardDelete;
+using PetFamily.Application.Volunteers.MovePetPosition;
 using PetFamily.Application.Volunteers.Restore;
 using PetFamily.Application.Volunteers.SoftDelete;
 using PetFamily.Application.Volunteers.UpdateMainInfo;
@@ -37,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<AddBreedHandler>();
         services.AddScoped<DeletePetPhotosHandler>();
         services.AddScoped<GetPetPhotosHandler>();
+        services.AddScoped<MovePetPositionHandler>();
 
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 

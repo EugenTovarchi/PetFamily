@@ -83,8 +83,9 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .IsRequired();
 
         builder.Property(p => p.Position)
-             .HasConversion(
-             SerialNumber => SerialNumber.Value,
+            .HasColumnName("position")
+            .HasConversion(
+             Position => Position.Value,
              value => Position.Create(value).Value);
 
         builder.Property(p => p.CreatedAt)

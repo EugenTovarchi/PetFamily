@@ -256,7 +256,7 @@ public class Volunteer : Shared.Entity<VolunteerId>, ISoftDeletable
             return Result.Success<Error>();
 
         //обработка случаев, когда позиция выходит за границы 
-        var settedPosition = SetNewPositionIfOutOfRange(newPosition);  //
+        var settedPosition = SetNewPositionIfOutOfRange(newPosition);  
         if (settedPosition.IsFailure)
             return settedPosition.Error;
 

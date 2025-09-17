@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PetFamily.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class addSpeciesTables : Migration
+    public partial class position : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,18 +58,19 @@ namespace PetFamily.Infrastructure.Migrations
                     health_info = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     weight = table.Column<double>(type: "double precision", nullable: true),
                     height = table.Column<double>(type: "double precision", nullable: true),
+                    species_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    breed_id = table.Column<Guid>(type: "uuid", nullable: false),
                     owner_phone = table.Column<string>(type: "text", nullable: true),
                     castrated = table.Column<bool>(type: "boolean", nullable: true),
                     vaccinated = table.Column<bool>(type: "boolean", nullable: false),
                     birthday = table.Column<DateOnly>(type: "date", nullable: true),
                     pet_status = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     created_at = table.Column<DateTime>(type: "date", nullable: false),
-                    species_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    breed_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    position = table.Column<int>(type: "integer", nullable: false),
                     is_deleted = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     volunteer_id = table.Column<Guid>(type: "uuid", nullable: true),
                     city = table.Column<string>(type: "text", nullable: false),
-                    flat = table.Column<int>(type: "integer", nullable: false),
+                    flat = table.Column<int>(type: "integer", nullable: true),
                     house = table.Column<int>(type: "integer", nullable: false),
                     street = table.Column<string>(type: "text", nullable: false),
                     pet_requisites = table.Column<string>(type: "jsonb", nullable: true),

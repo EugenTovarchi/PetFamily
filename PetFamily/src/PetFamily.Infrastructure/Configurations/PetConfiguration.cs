@@ -82,6 +82,11 @@ public class PetConfiguration : IEntityTypeConfiguration<Pet>
             .HasDefaultValue(PetStatus.LookingTreatment)
             .IsRequired();
 
+        builder.Property(p => p.Position)
+             .HasConversion(
+             SerialNumber => SerialNumber.Value,
+             value => Position.Create(value).Value);
+
         builder.Property(p => p.CreatedAt)
             .HasColumnName("created_at")
             .HasColumnType("date")

@@ -12,20 +12,17 @@ namespace PetFamily.Application.Volunteers.MovePetPosition;
 
 public class MovePetPositionHandler
 {
-    private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteerRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<MovePetPositionCommand> _validator;
     private readonly ILogger<MovePetPositionHandler> _logger;
 
     public MovePetPositionHandler(
-        IFileProvider fileProvider,
         IVolunteersRepository volunteerRepository,
         IUnitOfWork unitOfWork,
         IValidator<MovePetPositionCommand> validator,
         ILogger<MovePetPositionHandler> logger)
     {
-        _fileProvider = fileProvider;
         _volunteerRepository = volunteerRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;

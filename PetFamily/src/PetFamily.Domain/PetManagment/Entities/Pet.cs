@@ -49,7 +49,6 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
     private DateTime? _deletionDate;
     public DateTime? DeletionDate => _deletionDate;
 
-    public ValueObjectList<PetPhoto>? Photos { get; private set; } 
 
     public string Name { get; private set; } = string.Empty;
 
@@ -65,6 +64,8 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
 
     public double? Height { get; private set; }
 
+    public PetType PetType { get; private set; } = null!;
+
     public Phone? OwnerPhone { get; private set; } 
 
     public bool? Castrated { get; private set; }
@@ -77,7 +78,9 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
 
     public DateTime CreatedAt { get; private set; }
 
-    public PetType PetType { get; private set; } = null!;
+    public Position Position { get; private set; } = null!;
+
+    public ValueObjectList<PetPhoto>? Photos { get; private set; } 
 
 
     private readonly List<Requisites> _petRequisites = [];
@@ -153,6 +156,30 @@ public class Pet : Shared.Entity<PetId>, ISoftDeletable
             .ToList();
 
         Photos = new ValueObjectList<PetPhoto>(remainingPhotos);
+
+        return Result.Success<Error>();
+    }
+
+    public void SetPosition (Position position) => Position = position;
+
+    public UnitResult<Error> MoveForward()
+    {
+        var newPosition = Position.Forward();
+        if (newPosition.IsFailure)
+            return newPosition.Error;
+
+        Position = newPosition.Value;
+
+        return Result.Success<Error>();
+    }
+
+    public UnitResult<Error> MoveBack()
+    {
+        var newPosition = Position.Back();
+        if (newPosition.IsFailure)
+            return newPosition.Error;
+
+        Position = newPosition.Value;
 
         return Result.Success<Error>();
     }

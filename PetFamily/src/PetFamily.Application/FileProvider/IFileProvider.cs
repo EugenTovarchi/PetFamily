@@ -18,5 +18,9 @@ public interface IFileProvider
     Task<Result<IReadOnlyList<PetPhotoUrlResponse>, Error>> GetPhotos(
         IEnumerable<PhotoMainData> photosData,
         CancellationToken cancellationToken = default);
+
+    Task<UnitResult<Error>> RemovePhoto(
+        PhotoMainData photoInfo,
+        CancellationToken ct);
 }
 

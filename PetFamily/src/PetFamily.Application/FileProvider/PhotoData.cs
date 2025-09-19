@@ -1,5 +1,3 @@
-using PetFamily.Domain.Shared;
-
 namespace PetFamily.Application.FileProvider;
 
 /// <summary>
@@ -8,4 +6,4 @@ namespace PetFamily.Application.FileProvider;
 /// <param name="Stream"></param>
 /// <param name="PhotoPath"></param>
 /// <param name="BucketName"></param>
-public record PhotoData(Stream Stream, PhotoPath PhotoPath, string BucketName);
+public record PhotoData(Stream Stream, PhotoMainData PhotoInfo);

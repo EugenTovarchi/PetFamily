@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
 using PetFamily.Application.FileProvider;
+using PetFamily.Application.MessageQueue;
 using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.ValueObjects;
 using PetFamily.Domain.PetManagment.ValueObjects.Ids;
@@ -17,6 +18,7 @@ public class UploadPetPhotosHandler
 
     private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteerRepository;
+    private readonly IMessageQueue<IEnumerable<PhotoMainData>> _messageQueue;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<UploadPetPhotosCommand> _validator; 
     private readonly ILogger<UploadPetPhotosHandler> _logger;
@@ -24,11 +26,13 @@ public class UploadPetPhotosHandler
     public UploadPetPhotosHandler(
         IFileProvider fileProvider,
         IVolunteersRepository volunteerRepository,
+        IMessageQueue<IEnumerable<PhotoMainData>> messageQueue,
         IUnitOfWork unitOfWork,
         IValidator<UploadPetPhotosCommand> validator,
         ILogger<UploadPetPhotosHandler> logger)
     {
         _fileProvider = fileProvider;
+        _messageQueue = messageQueue;
         _volunteerRepository = volunteerRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
@@ -76,7 +80,7 @@ public class UploadPetPhotosHandler
                 return photoPath.Error.ToFailure();
 
             //Создание объекта с данными фото
-            var photoData = new PhotoData(photo.Stream, photoPath.Value, BUCKET_NAME);
+            var photoData = new PhotoData(photo.Stream, new PhotoMainData(photoPath.Value, BUCKET_NAME));
 
             //Добавляет подготовленные данные фото в общий список.
             photosData.Add(photoData);
@@ -84,7 +88,10 @@ public class UploadPetPhotosHandler
 
         var photosPathsResult = await _fileProvider.UploadFiles(photosData, cancellationToken);
         if (photosPathsResult.IsFailure)
+        {
+            await _messageQueue.WriteAsync(photosData.Select(f => f.PhotoInfo), cancellationToken); 
             return photosPathsResult.Error.ToFailure();
+        }
 
         //Определение параметров для хранения в БД
         //В базе данных хранятся только пути к файлам, а не сами файлы(которые могут быть большими).

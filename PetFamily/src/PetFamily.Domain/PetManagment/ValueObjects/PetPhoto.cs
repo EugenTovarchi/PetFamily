@@ -1,8 +1,9 @@
 using PetFamily.Domain.Shared;
+using ValueObject = CSharpFunctionalExtensions.ValueObject;
 
 namespace PetFamily.Domain.PetManagment.ValueObjects;
 
-public record PetPhoto
+public class PetPhoto : ValueObject
 {
     public PetPhoto(PhotoPath pathToStorage)
     {
@@ -10,4 +11,9 @@ public record PetPhoto
     }
 
     public PhotoPath PathToStorage { get; }
+
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
+        yield return PathToStorage;
+    }
 }

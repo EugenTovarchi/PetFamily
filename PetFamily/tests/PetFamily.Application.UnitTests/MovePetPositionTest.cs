@@ -23,7 +23,7 @@ public  class MovePetPositionTest
     private readonly Mock<ILogger<MovePetPositionHandler>> _loggerMock;
     public MovePetPositionTest()
     {
-        _volunteerRepositoryMock =  new Mock<IVolunteersRepository>(); 
+        _volunteerRepositoryMock = new Mock<IVolunteersRepository>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _validatorMock = new Mock<IValidator<MovePetPositionCommand>>();
         _loggerMock = new Mock<ILogger<MovePetPositionHandler>>();

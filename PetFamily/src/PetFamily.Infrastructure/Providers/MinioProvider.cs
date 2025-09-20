@@ -34,7 +34,7 @@ public class MinioProvider : IFileProvider
 
         try
         {
-            await IfBucketsNotExistCreateBucket(filesList, cancellationToken);
+            await IfBucketsNotExistCreateBucket(photosData.Select(file => file.PhotoInfo.BucketName), cancellationToken);
 
             //в задачу кладем выполнение метода PutObject для каждого файла учитывая ограничение
             var tasks = filesList.Select(async file =>
@@ -138,7 +138,7 @@ public class MinioProvider : IFileProvider
             _logger.LogError(ex, "Fail to get files in Minio");
 
             return Error.Failure("Minio.GetUrl.Failed", "Failed to generate URLs");
-            
+
         }
     }
 
@@ -157,11 +157,11 @@ public class MinioProvider : IFileProvider
 
         if (bucketExist == false)
             return Errors.General.NotFoundValue("bucket");
-        
 
-            var args = new RemoveObjectsArgs()
-            .WithBucket(photoData.BucketName)
-            .WithObject(photoData.PhotoPath.Path);
+
+        var args = new RemoveObjectsArgs()
+        .WithBucket(photoData.BucketName)
+        .WithObject(photoData.PhotoPath.Path);
 
         try
         {
@@ -184,6 +184,43 @@ public class MinioProvider : IFileProvider
         }
     }
 
+    //Удаление по 1му файлу из minio в BackgroundService
+    public async Task<UnitResult<Error>> RemovePhoto(
+        PhotoMainData photoInfo,
+        CancellationToken ct)
+    {
+        try
+        {
+            var statArgs = new StatObjectArgs()
+                .WithBucket(photoInfo.BucketName)
+                .WithObject(photoInfo.PhotoPath.Path);
+
+            //Проверка на то, что файлы существуют в Minio по собранным аргументам
+            var statObject = await _minioClient.StatObjectAsync(statArgs, ct); //тут нужны права в MInio 
+            if (statObject == null)
+                return UnitResult.Success<Error>();
+
+            await IfBucketsNotExistCreateBucket([photoInfo.BucketName], ct);
+
+            var removeArgs = new RemoveObjectArgs()
+              .WithBucket(photoInfo.BucketName)
+              .WithObject(photoInfo.PhotoPath.Path);
+
+            await _minioClient.RemoveObjectAsync(removeArgs, ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+               "Fail to remove file in minio with path {path} in bucket {bucket}",
+               photoInfo.PhotoPath.Path,
+               photoInfo.BucketName);
+
+            return Error.Failure("file.remove", "Fail to remove file in minio");
+        }
+
+        return UnitResult.Success<Error>();
+    }
+
     private async Task<Result<PhotoPath, Error>> PutObject(
         PhotoData photoData,
         SemaphoreSlim semaphoreSlim,
@@ -193,10 +230,10 @@ public class MinioProvider : IFileProvider
         await semaphoreSlim.WaitAsync(cancellationToken);
 
         var putObjectArgs = new PutObjectArgs()
-            .WithBucket(photoData.BucketName)
+            .WithBucket(photoData.PhotoInfo.BucketName)
             .WithStreamData(photoData.Stream)
-            .WithObjectSize(photoData.Stream.Length) 
-            .WithObject(photoData.PhotoPath.Path);  
+            .WithObjectSize(photoData.Stream.Length)
+            .WithObject(photoData.PhotoInfo.PhotoPath.Path);
 
         try
         {
@@ -204,14 +241,14 @@ public class MinioProvider : IFileProvider
             await _minioClient
                 .PutObjectAsync(putObjectArgs, cancellationToken);
 
-            return photoData.PhotoPath;
+            return photoData.PhotoInfo.PhotoPath;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex,
                 "Fail to upload file in minio with path {path} in bucket {bucket}",
-                photoData.PhotoPath.Path,
-                photoData.BucketName);
+                photoData.PhotoInfo.PhotoPath.Path,
+                photoData.PhotoInfo.BucketName);
 
             return Error.Failure("file.upload", "Fail to upload file in minio");
         }
@@ -222,11 +259,11 @@ public class MinioProvider : IFileProvider
     }
 
     private async Task IfBucketsNotExistCreateBucket(
-        IEnumerable<PhotoData> photosData,
+        IEnumerable<string> buckets,
         CancellationToken cancellationToken)
     {
         //преобразуем в коллекцию уникальных папок - убираем дубликаты
-        HashSet<string> bucketNames = [.. photosData.Select(file => file.BucketName)]; //получаем bucketName у каждого файла(внутри рекорда есть свойство)
+        HashSet<string> bucketNames = [.. buckets]; //получаем bucketName у каждого файла(внутри рекорда есть свойство)
 
         foreach (var bucketName in bucketNames)
         {

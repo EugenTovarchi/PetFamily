@@ -2,7 +2,6 @@ using CSharpFunctionalExtensions;
 using FluentValidation;
 using Microsoft.Extensions.Logging;
 using PetFamily.Application.Database;
-using PetFamily.Application.FileProvider;
 using PetFamily.Contracts.Commands.Volunteers;
 using PetFamily.Domain.PetManagment.ValueObjects.Ids;
 using PetFamily.Domain.Shared;
@@ -12,20 +11,17 @@ namespace PetFamily.Application.Volunteers.MovePetPosition;
 
 public class MovePetPositionHandler
 {
-    private readonly IFileProvider _fileProvider;
     private readonly IVolunteersRepository _volunteerRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<MovePetPositionCommand> _validator;
     private readonly ILogger<MovePetPositionHandler> _logger;
 
     public MovePetPositionHandler(
-        IFileProvider fileProvider,
         IVolunteersRepository volunteerRepository,
         IUnitOfWork unitOfWork,
         IValidator<MovePetPositionCommand> validator,
         ILogger<MovePetPositionHandler> logger)
     {
-        _fileProvider = fileProvider;
         _volunteerRepository = volunteerRepository;
         _unitOfWork = unitOfWork;
         _validator = validator;
